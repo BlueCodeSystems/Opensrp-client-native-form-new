@@ -1,0 +1,318 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
+        classpath 'org.apache.commons:commons-lang3:3.12.0'
+        classpath 'com.android.tools.lint:lint:30.4.2'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+android {
+    compileSdkVersion androidCompileSdkVersion
+    buildToolsVersion androidBuildToolsVersion
+
+    // defaultPublishConfig is obsolete in newer AGP; use default variant publishing
+
+    defaultConfig {
+        minSdkVersion androidMinSdkVersion
+        targetSdkVersion androidTargetSdkVersion
+        versionCode Integer.parseInt(project.VERSION_CODE)
+        versionName project.VERSION_NAME
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            testCoverageEnabled false
+        }
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
+    // Enable publishing of the release variant and attach sources
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+repositories {
+    // Prefer local flatDir if AARs are provided in the root or module libs
+    flatDir {
+        dirs rootProject.file('libs'), file("$projectDir/libs"), rootProject.projectDir
+    }
+    // Ensure JitPack is available for GitHub-hosted libraries
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+    google()
+}
+
+dependencies {
+    implementation('org.smartregister:opensrp-client-simprints:1.1.0-SNAPSHOT@aar') {
+        transitive = true
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'design'
+    }
+    implementation 'com.github.bmelnychuk:atv:1.2.9'
+    // Prefer a local patched Material AAR if provided; remove remote dependency to avoid AAPT issues
+    implementation 'com.github.johnkil.print:print:1.3.1'
+    implementation 'com.github.rey5137:material:1.3.1'
+    implementation 'org.smartregister:opensrp-client-materialedittext:2.1.6-SNAPSHOT'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation('com.github.ganfra:material-spinner:2.0.0') {
+        exclude group: 'com.nineoldandroids', module: 'library'
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+    implementation('com.google.android.gms:play-services-location:20.0.0') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+    implementation('com.google.android.gms:play-services-vision:20.1.3') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+        exclude group: 'com.android.support', module: 'support-v4'
+        exclude group: 'com.android.support', module: 'support-annotations'
+        exclude group: 'com.android.support', module: 'recyclerview-v7'
+    }
+
+    implementation 'org.smartregister:opensrp-client-utils:0.0.6-SNAPSHOT'
+    implementation 'androidx.test:core:1.4.0'
+
+    def easyRulesVersion = '3.4.0'
+    implementation "org.jeasy:easy-rules-core:$easyRulesVersion"
+    implementation "org.jeasy:easy-rules-mvel:$easyRulesVersion"
+
+    implementation 'joda-time:joda-time:2.10.14'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    // Pick up any local AARs/JARs (e.g., rdt-capture, rdt-reader) from root/libs, module libs, or root itself
+    // Note: Do NOT place CircleProgressbar AAR here if using the local module to avoid duplicates
+    implementation fileTree(dir: rootProject.file('libs'), include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
+    implementation fileTree(dir: "$projectDir/libs", include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
+    implementation fileTree(dir: rootProject.projectDir, include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
+
+    // Use local module of CircleProgressbar
+    implementation project(':circleprogressbar')
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
+    // CircleProgressbar will be picked up via fileTree above if present locally
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation "org.greenrobot:eventbus:3.2.0"
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // PowerMock
+    def powerMockVersion = '2.0.9'
+    testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
+    testImplementation "org.powermock:powermock-module-junit4-rule:$powerMockVersion"
+    testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
+    testImplementation "org.powermock:powermock-classloading-xstream:$powerMockVersion"
+    implementation('com.github.raihan-mpower:FancyAlertDialog-Android:0.3@aar') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+
+    }
+
+    androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.6.3'
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestImplementation('androidx.test.ext:junit:1.1.3') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+
+    }
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.4.0') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    androidTestImplementation('androidx.test:rules:1.4.0') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+
+    }
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
+    testImplementation 'org.mockito:mockito-core:3.12.4'
+    testImplementation('com.squareup:fest-android:1.0.8') { exclude module: 'support-v4' }
+    testImplementation 'org.robolectric:robolectric:4.3.1'
+    testImplementation "org.json:json:20220320"
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+
+    reports {
+        xml.required.set(true)
+        xml.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"))
+
+        html.required.set(true)
+        html.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoRootReport/html"))
+    }
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*', '**/*$ViewBinder*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/javac/debug/classes/", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories.from = files([mainSrc])
+    classDirectories.from = files([debugTree])
+    executionData.from = fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+    ])
+}
+
+tasks.coveralls {
+    dependsOn 'jacocoTestReport'
+}
+
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
+}
+
+
+// Modern Maven publishing configuration (replaces legacy maven plugin)
+afterEvaluate { p ->
+    def pomName = p.findProperty('POM_SETTING_NAME') ?: p.name
+    def pomDesc = p.findProperty('POM_SETTING_DESCRIPTION') ?: ''
+    def pomUrl = p.findProperty('POM_SETTING_URL') ?: ''
+    def pomScmUrl = p.findProperty('POM_SETTING_SCM_URL') ?: ''
+    def pomScmConn = p.findProperty('POM_SETTING_SCM_CONNECTION') ?: ''
+    def pomScmDevConn = p.findProperty('POM_SETTING_SCM_DEV_CONNECTION') ?: ''
+    def pomLicenseName = p.findProperty('POM_SETTING_LICENCE_NAME') ?: 'The Apache Software License, Version 2.0'
+    def pomLicenseUrl = p.findProperty('POM_SETTING_LICENCE_URL') ?: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    def pomLicenseDist = p.findProperty('POM_SETTING_LICENCE_DIST') ?: 'repo'
+    def pomDevId = p.findProperty('POM_SETTING_DEVELOPER_ID') ?: ''
+    def pomDevName = p.findProperty('POM_SETTING_DEVELOPER_NAME') ?: ''
+    def artifactIdVal = p.findProperty('POM_SETTING_ARTIFACT_ID') ?: p.name
+    def packagingVal = p.findProperty('POM_SETTING_PACKAGING') ?: 'aar'
+
+    // Default to local publishing unless -PmavenLocal=false
+    def mavenLocalFlag = p.hasProperty('mavenLocal') ? p.property('mavenLocal').toString().toBoolean() : true
+    def isRelease = !(p.VERSION_NAME as String).contains('SNAPSHOT')
+    def sonatypeRepositoryURL = isRelease ?
+            (p.hasProperty('RELEASE_REPOSITORY_URL') ? p.property('RELEASE_REPOSITORY_URL') : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') :
+            (p.hasProperty('SNAPSHOT_REPOSITORY_URL') ? p.property('SNAPSHOT_REPOSITORY_URL') : 'https://oss.sonatype.org/content/repositories/snapshots/')
+
+    // Optional Javadoc jar from existing javadoc task if available
+    tasks.register('androidJavadocsJar', Jar) {
+        dependsOn tasks.named('javadoc')
+        archiveClassifier.set('javadoc')
+        from tasks.named('javadoc').get().destinationDir
+    }
+
+    publishing {
+        publications {
+            create('release', MavenPublication) {
+                groupId = p.group
+                artifactId = artifactIdVal
+                version = p.VERSION_NAME
+
+                // Publish the AAR from the release component when available
+                def relComp = p.components.findByName('release') ?: p.components.findByName('default')
+                if (relComp != null) {
+                    from relComp
+                } else {
+                    // Fallback: attach the generated AAR directly
+                    def aarPath = "$buildDir/outputs/aar/${p.name}-release.aar"
+                    artifact(aarPath)
+                }
+
+                // Attach javadoc jar if it exists
+                artifact tasks.named('androidJavadocsJar')
+
+                pom {
+                    name.set(pomName)
+                    description.set(pomDesc)
+                    url.set(pomUrl)
+                    packaging = packagingVal
+                    licenses {
+                        license {
+                            name.set(pomLicenseName)
+                            url.set(pomLicenseUrl)
+                            distribution.set(pomLicenseDist)
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set(pomDevId)
+                            name.set(pomDevName)
+                        }
+                    }
+                    scm {
+                        url.set(pomScmUrl)
+                        connection.set(pomScmConn)
+                        developerConnection.set(pomScmDevConn)
+                    }
+                }
+            }
+        }
+        repositories {
+            if (mavenLocalFlag) {
+                mavenLocal()
+            } else {
+                maven {
+                    url = uri(sonatypeRepositoryURL)
+                    credentials {
+                        username = p.findProperty('sonatypeUsername') ?: ''
+                        password = p.findProperty('sonatypePassword') ?: ''
+                    }
+                }
+            }
+        }
+    }
+
+    signing {
+        required { isRelease && gradle.taskGraph.hasTask('publish') }
+        sign publishing.publications
+    }
+}
+
+task javadoc(type: Javadoc) {
+    failOnError false
+    def mainSrc = "$project.projectDir/src/main/java"
+    source = files([mainSrc])
+    // Compute classpath at execution time to avoid missing configuration errors
+    doFirst {
+        def boot = project.files(android.bootClasspath)
+        def compCp = configurations.findByName('releaseCompileClasspath') ?: configurations.findByName('debugCompileClasspath') ?: files()
+        classpath = files(boot, compCp)
+    }
+}

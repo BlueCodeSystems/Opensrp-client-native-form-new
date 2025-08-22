@@ -1,0 +1,11 @@
+int attr backgroundWidth 0x0
+int attr prefix 0x0
+int attr roundedCorners 0x0
+int attr suffix 0x0
+int attr textSize 0x0
+int[] styleable CircleProgressBar { 0x0, 0x0, 0x0, 0x0, 0x0 }
+int styleable CircleProgressBar_backgroundWidth 0
+int styleable CircleProgressBar_prefix 1
+int styleable CircleProgressBar_roundedCorners 2
+int styleable CircleProgressBar_suffix 3
+int styleable CircleProgressBar_textSize 4

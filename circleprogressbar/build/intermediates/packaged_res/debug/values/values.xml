@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CircleProgressBar">
+        <attr format="integer|dimension" name="backgroundWidth"/>
+        <attr format="string" name="prefix"/>
+        <attr format="boolean" name="roundedCorners"/>
+        <attr format="string" name="suffix"/>
+        <attr format="dimension" name="textSize"/>
+    </declare-styleable>
+</resources>

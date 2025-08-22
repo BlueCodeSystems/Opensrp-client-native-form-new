@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">native-form-sample</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_single">Json Form (Single)</string>
+    <string name="action_wizard">Json Form Wizard</string>
+    <string name="action_validation">Json Form Validation</string>
+
+    <string name="profile">Profile</string>
+    <string name="validation_test">Working with validation</string>
+    <string name="next">Endelea</string>
+    <string name="previous">Rudi</string>
+    <string name="save">Tuma</string>
+    <string name="basic_form">Basic Form</string>
+    <string name="update_radio_button">Update Radio Button</string>
+    <string name="birth_register">BIRTH REGISTER</string>
+    <string name="wizard_multi_step_form">WIZARD (MULTI-STEP FORM)</string>
+    <string name="rules_engine_logic">RULES ENGINE LOGIC</string>
+    <string name="constraints">CONSTRAINTS</string>
+    <string name="generic_popup">GENERIC POPUP</string>
+    <string name="form_validation">FORM VALIDATION</string>
+    <string name="expansion_panel">Expansion Panel</string>
+    <string name="repeating_group">Repeating Group</string>
+    <string name="multiselect_list">MultiSelect List</string>
+    <string name="optibp_widget">OptiBP Widget</string>
+</resources>

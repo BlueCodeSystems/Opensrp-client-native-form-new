@@ -1,0 +1,3 @@
+rootProject.name = 'opensrp-client-native-form'
+// Include only actual modules present in the repo
+include ':android-json-form-wizard', ':sample', ':form_tester', ':circleprogressbar'

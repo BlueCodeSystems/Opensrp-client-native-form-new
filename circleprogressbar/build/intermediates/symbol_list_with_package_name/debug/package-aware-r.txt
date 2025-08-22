@@ -1,0 +1,7 @@
+com.emredavarci.circleprogressbar
+attr backgroundWidth
+attr prefix
+attr roundedCorners
+attr suffix
+attr textSize
+styleable CircleProgressBar backgroundWidth prefix roundedCorners suffix textSize

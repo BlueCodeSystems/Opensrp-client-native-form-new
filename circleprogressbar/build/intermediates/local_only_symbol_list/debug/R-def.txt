@@ -1,0 +1,8 @@
+R_DEF: Internal format may change without notice
+local
+attr? backgroundWidth
+attr? prefix
+attr? roundedCorners
+attr? suffix
+attr? textSize
+styleable CircleProgressBar backgroundWidth prefix roundedCorners suffix textSize

@@ -1,0 +1,76 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven{  url 'https://plugins.gradle.org/m2/' }
+    }
+
+    dependencies {
+        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
+        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.12.0'
+        classpath 'com.android.tools.lint:lint:30.4.2'
+    }
+}
+// Ensure all projects have correct coordinates
+allprojects { proj ->
+    proj.version = VERSION_NAME
+    proj.group = GROUP
+}
+
+configure(allprojects) { project ->
+    buildscript {
+        repositories {
+            mavenCentral()
+            google()
+            maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+            maven { url 'https://plugins.gradle.org/m2/'}
+            mavenLocal()
+        }
+    }
+}
+project.ext.preDexLibs = !project.hasProperty('disablePreDex')
+subprojects {
+
+    group = 'org.smartregister'
+
+    ext.androidToolsBuildGradle = '7.4.2'
+    ext.androidBuildToolsVersion = '34.0.0'
+    ext.androidMinSdkVersion = 18
+    ext.androidCompileSdkVersion = 34
+    ext.androidTargetSdkVersion = 34
+
+    ext.androidAnnotationsVersion = '3.0.1'
+    ext.androidAnnotationsAPIVersion = '3.0.1'
+
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        mavenLocal()
+    }
+
+    // Improve build server performance by allowing disabling of pre-dexing
+    // (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
+    // Removed obsolete dexOptions configuration not supported in newer AGP
+}
+apply plugin: 'java'
+apply plugin: 'io.codearte.nexus-staging'
+// Configure test reports via tasks API
+tasks.withType(Test).configureEach {
+    reports {
+        html.required.set(false)
+        junitXml.required.set(false)
+    }
+}
+
+def isReleaseBuild() {
+    return version.contains("SNAPSHOT") == false
+}
+
+// Configure Nexus staging credentials if publishing to Sonatype
+nexusStaging {
+    username = findProperty('sonatypeUsername') ?: ''
+    password = findProperty('sonatypePassword') ?: ''
+}
