@@ -2226,4 +2226,5 @@ For a form named `example_form` the generated assets will follow the following n
 
 The properties file can then be copied over to the `resources` folder of your Android project under `src/main`. The placeholder-injected JsonForm will typically be copied over to the `assets` folder of your Android project (although not mandatory).
 #   o p e n s r p - c l i e n t - n a t i v e - f o r m  
+ #   O p e n s r p - c l i e n t - n a t i v e - f o r m - n e w  
  
