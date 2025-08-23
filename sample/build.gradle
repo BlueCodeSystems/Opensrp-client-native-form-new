@@ -22,14 +22,13 @@ apply plugin: 'com.android.application'
 
 android {
 
-    compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion androidBuildToolsVersion
+    compileSdk androidCompileSdkVersion
 
     defaultConfig {
         // Unique applicationId so it can coexist with form_tester
         applicationId "org.smartregister.nativeform.sample"
-        minSdkVersion androidMinSdkVersion
-        targetSdkVersion androidTargetSdkVersion
+        minSdk androidMinSdkVersion
+        targetSdk androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -40,16 +39,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-            // Disable coverage to avoid Jacoco transform issues on runtime classpath
-            testCoverageEnabled false
-        }
+        debug { }
     }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace "org.smartregister.nativeform.sample"
 }
 
 dependencies {

@@ -2,12 +2,11 @@ apply plugin: 'com.android.library'
 
 android {
     namespace "com.emredavarci.circleprogressbar"
-    compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion androidBuildToolsVersion
+    compileSdk androidCompileSdkVersion
 
     defaultConfig {
-        minSdkVersion androidMinSdkVersion
-        targetSdkVersion androidTargetSdkVersion
+        minSdk androidMinSdkVersion
+        targetSdk androidTargetSdkVersion
         consumerProguardFiles 'consumer-rules.pro'
     }
 

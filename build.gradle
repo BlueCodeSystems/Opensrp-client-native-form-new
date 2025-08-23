@@ -7,9 +7,8 @@ buildscript {
 
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.5.2'
         classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.12.0'
-        classpath 'com.android.tools.lint:lint:30.4.2'
     }
 }
 // Ensure all projects have correct coordinates
@@ -34,7 +33,7 @@ subprojects {
 
     group = 'org.smartregister'
 
-    ext.androidToolsBuildGradle = '7.4.2'
+    ext.androidToolsBuildGradle = '8.5.2'
     ext.androidBuildToolsVersion = '34.0.0'
     ext.androidMinSdkVersion = 18
     ext.androidCompileSdkVersion = 34

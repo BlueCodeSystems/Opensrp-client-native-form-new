@@ -6,7 +6,6 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
         classpath 'org.apache.commons:commons-lang3:3.12.0'
-        classpath 'com.android.tools.lint:lint:30.4.2'
     }
 }
 
@@ -18,18 +17,16 @@ apply plugin: 'com.github.kt3k.coveralls'
 
 jacoco {
     toolVersion = "0.8.8"
-    reportsDir = file("$buildDir/reports/jacoco")
 }
 
 android {
-    compileSdkVersion androidCompileSdkVersion
-    buildToolsVersion androidBuildToolsVersion
+    compileSdk androidCompileSdkVersion
 
     // defaultPublishConfig is obsolete in newer AGP; use default variant publishing
 
     defaultConfig {
-        minSdkVersion androidMinSdkVersion
-        targetSdkVersion androidTargetSdkVersion
+        minSdk androidMinSdkVersion
+        targetSdk androidTargetSdkVersion
         versionCode Integer.parseInt(project.VERSION_CODE)
         versionName project.VERSION_NAME
         multiDexEnabled true
@@ -42,9 +39,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug {
-            testCoverageEnabled false
-        }
+        debug { }
     }
 
     lint {
@@ -57,8 +52,10 @@ android {
             includeAndroidResources = true
         }
     }
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
+    packaging {
+        resources {
+            excludes += 'META-INF/DEPENDENCIES'
+        }
     }
 
     // Enable publishing of the release variant and attach sources
@@ -67,6 +64,7 @@ android {
             withSourcesJar()
         }
     }
+    namespace "com.vijay.jsonwizard"
 }
 
 
