@@ -11,9 +11,11 @@
 
 # OpenSRP Client Native Form
 
+
 A reusable Android library for building rich, validated forms from JSON. It powers multiple OpenSRP apps and extends the original [Android JSON Form Wizard](https://github.com/vijayrawatsan/android-json-form-wizard).
 
 ## Contents
+
 
 - [Features](#features)
 - [Installation](#installation)
@@ -26,6 +28,7 @@ A reusable Android library for building rich, validated forms from JSON. It powe
 
 ## Features
 
+
 - Define forms in plain JSON, no layouts to build by hand.
 - Built-in validation: regex, numeric, required, and custom rules.
 - Constraints: min/max, visibility, skip logic, calculated fields.
@@ -34,6 +37,7 @@ A reusable Android library for building rich, validated forms from JSON. It powe
 - Multi-language strings and external rules engine support.
 
 ## Installation
+
 
 You can consume the library via Maven (if available for your org) or as a local module/AAR.
 
@@ -2173,6 +2177,8 @@ Alternatively, a different folder can be specified by setting the `MLS_ASSETS_FO
 For a form named `example_form` the generated assets will follow the following naming convention : `example_form.json` and `example_form.properties`.
 
 The properties file can then be copied over to the `resources` folder of your Android project under `src/main`. The placeholder-injected JsonForm will typically be copied over to the `assets` folder of your Android project (although not mandatory).
-#   o p e n s r p - c l i e n t - n a t i v e - f o r m  
- #   O p e n s r p - c l i e n t - n a t i v e - f o r m - n e w  
+#   o p e n s r p - c l i e n t - n a t i v e - f o r m 
+ 
+ #   O p e n s r p - c l i e n t - n a t i v e - f o r m - n e w 
+ 
  
