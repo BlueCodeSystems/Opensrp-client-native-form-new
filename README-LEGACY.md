@@ -1,151 +1,203 @@
 
-[![Android CI with Gradle](https://github.com/opensrp/opensrp-client-native-form/actions/workflows/ci.yml/badge.svg)](https://github.com/opensrp/opensrp-client-native-form/actions/workflows/ci.yml)
-[![Coverage Status](https://coveralls.io/repos/github/opensrp/opensrp-client-native-form/badge.svg?branch=master)](https://coveralls.io/github/opensrp/opensrp-client-native-form?branch=master)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/8f21f77d06bf41bcb2405022a53b4a3c)](https://www.codacy.com/gh/opensrp/opensrp-client-native-form/dashboard)
+[![Android CI with Gradle](https://github.com/opensrp/opensrp-client-native-form/actions/workflows/ci.yml/badge.svg)](https://github.com/opensrp/opensrp-client-native-form/actions/workflows/ci.yml) [![Coverage Status](https://coveralls.io/repos/github/opensrp/opensrp-client-native-form/badge.svg?branch=master)](https://coveralls.io/github/opensrp/opensrp-client-native-form?branch=master) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/8f21f77d06bf41bcb2405022a53b4a3c)](https://www.codacy.com/gh/opensrp/opensrp-client-native-form/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=OpenSRP/opensrp-client-native-form&amp;utm_campaign=Badge_Grade)
 
-<p align="center">
-  <a href="https://smartregister.atlassian.net/wiki/dashboard.action">
-    <img src="https://raw.githubusercontent.com/OpenSRP/opensrp-client/master/opensrp-app/res/drawable-mdpi/login_logo.png" alt="OpenSRP" height="60" />
-  </a>
-</p>
+[![Dristhi](https://raw.githubusercontent.com/OpenSRP/opensrp-client/master/opensrp-app/res/drawable-mdpi/login_logo.png)](https://smartregister.atlassian.net/wiki/dashboard.action)
 
-# OpenSRP Client Native Form
+# Table of Contents
 
-A reusable Android library for building rich, validated forms from JSON. It powers multiple OpenSRP apps and extends the original [Android JSON Form Wizard](https://github.com/vijayrawatsan/android-json-form-wizard).
+* [Introduction](#introduction)
+* [Features](#features)
+* [App Walkthrough](#app-walkthrough)1
+* 
+   * [Sample Android Form](#2-sample-form)
+   * [Sample JSON Form](#sample-json-form)
+   * [Json Form Attributes](#json-form-attributes)
+* [Usage](#usage)
+* [Developer Documentation](#developer-documentation)
+   * [Pre-requisites](#pre-requisites)
+   * [Installation Devices](#installation-devices)
+   * [How to install](#how-to-install)
+   * [Customisations From Android Native JSON Form](#customisations-from-android-native-json-form)
+* [Multi Language Support (MLS)](#multi-language-support-mls)
+* [JsonForm MLS Asset Generator](#jsonform-mls-asset-generator-jmag)
 
-## Contents
 
-- [Features](#features)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Samples](#samples)
-- [Multilingual + Rules](#multilingual--rules)
-- [Build From Source](#build-from-source)
-- [Contributing](#contributing)
-- [License](#license)
+# Introduction
 
-## Features
+OpenSRP Client Native Form Module/app provides the ability to easily create Android forms using JSON forms.
 
-- Define forms in plain JSON, no layouts to build by hand.
-- Built-in validation: regex, numeric, required, and custom rules.
-- Constraints: min/max, visibility, skip logic, calculated fields.
-- OpenMRS/OpenSRP metadata mapping support.
-- Widgets: text, image capture, checkboxes, spinners, radio, barcode, date, tree, repeating groups, and more.
-- Multi-language strings and external rules engine support.
+Thanks to this [Android Native JSON Form Library](https://github.com/vijayrawatsan/android-json-form-wizard) from which OpenSRP Client Native Form has been customised to fit OpenSRP Requirements
 
-## Installation
+> **NOTE**
+>
+> **JSON Form** is written using **JSON (syntax)** which can be found [here](http://json.org/).
 
-You can consume the library via Maven (if available for your org) or as a local module/AAR.
 
-Gradle (example coordinates):
+# Features
 
-```gradle
-repositories {
-  mavenCentral()
-  maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-  maven { url 'https://jitpack.io' }
-  mavenLocal()
-}
+1. It enables definition of Android forms in JSON
+2. It enables one to define metadata for OpenMRS forms
+3. It enables one to define validations for form inputs in JSON
+   * [Regular Expression](https://en.wikipedia.org/wiki/Regular_expression) validation rules
+   * Number validation rules
+   * Alphabetic & alphanumeric validation rules in JSON
+4. It enables one to define form input constraints using JSON
+   * Min value
+   * Max value
+5. It enables one to define OpenMRS mappings in JSON
+6. It enables one to define skip logic for fields based on values entered in other fields
 
-dependencies {
-  implementation 'org.smartregister:android-json-form-wizard:3.1.2-SNAPSHOT'
-}
+# App Walkthrough
+
+1. When you open the app, the following page is displayed
+
+![Main Page Screenshot](https://user-images.githubusercontent.com/31766075/30383189-ca377ca6-98a9-11e7-8c23-9538214a975f.png)
+![Main Page Screenshot -> Menu Open](https://user-images.githubusercontent.com/31766075/30383181-c49c8732-98a9-11e7-9f95-f56fc0cb7931.png)
+
+This page has a menu at the top-right which opens a sample Patient Registration form written in JSON Form.
+
+#### 2. Sample Form
+
+Below is a sample Android Form created using the `OpenSRP Native JSON Form`:
+
+![Sample Form Screenshot](https://user-images.githubusercontent.com/31766075/30383177-c4285aa6-98a9-11e7-84de-5550c0d1d159.png)
+![Part 2](https://user-images.githubusercontent.com/31766075/30435414-6321428a-9972-11e7-84c5-d22e841faf1c.png)
+![Part 3](https://user-images.githubusercontent.com/31766075/30435413-631caed2-9972-11e7-8d86-adc81936f27d.png)
+![Part 4](https://user-images.githubusercontent.com/31766075/30435415-632578be-9972-11e7-9e67-c14cf250a2ab.png)
+
+This form has been generated from the `JSON Form` below: [Click here to Skip](#usage)
+
+#### Sample JSON Form
+
+`child_enrollment.json`
+
 ```
-
-Or add the module directly:
-
-```gradle
-dependencies {
-  implementation project(':android-json-form-wizard')
-}
-```
-
-## Quick Start
-
-1) Prepare a JSON form (see Samples below), then start `JsonFormActivity` with your form JSON:
-
-```java
-import android.content.Intent;
-import com.vijay.jsonwizard.activities.JsonFormActivity;
-
-// In an Activity/Fragment
-Intent intent = new Intent(this, JsonFormActivity.class);
-intent.putExtra("json", myFormJsonString);
-startActivityForResult(intent, 1234);
-```
-
-2) Loading a JSON file from assets:
-
-```java
-InputStream is = getAssets().open("json.form/child_enrollment.json");
-String json = new BufferedReader(new InputStreamReader(is))
-    .lines().collect(Collectors.joining("\n"));
-```
-
-3) Minimal form snippet:
-
-```json
 {
   "count": "1",
-  "encounter_type": "Sample",
+  "encounter_type": "Birth Registration",
+  "mother": {
+    "encounter_type": "New Woman Registration"
+  },
+  "entity_id": "",
+  "relational_id": "",
+  "metadata": {
+    "start": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "start",
+      "openmrs_entity_id": "163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "end": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "end",
+      "openmrs_entity_id": "163138AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "today": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "encounter",
+      "openmrs_entity_id": "encounter_date"
+    },
+    "deviceid": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "deviceid",
+      "openmrs_entity_id": "163149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "subscriberid": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "subscriberid",
+      "openmrs_entity_id": "163150AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "simserial": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "simserial",
+      "openmrs_entity_id": "163151AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "phonenumber": {
+      "openmrs_entity_parent": "",
+      "openmrs_entity": "concept",
+      "openmrs_data_type": "phonenumber",
+      "openmrs_entity_id": "163152AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    },
+    "encounter_location": "",
+    "look_up": {
+      "entity_id": "",
+      "value": ""
+    }
+  },
   "step1": {
-    "title": "Sample",
+    "title": "Birth Registration",
     "fields": [
-      { "key": "name", "type": "edit_text", "hint": "Name", "v_required": { "value": true, "err": "Enter name" } }
-    ]
-  }
-}
-```
-
-> JSON syntax reference: https://json.org
-
-## Samples
-
-- Sample app module: `sample/` (launches various example forms)
-- Test runner app: `form_tester/`
-- Example JSON assets: `android-json-form-wizard/src/main/assets/json.form/`
-
-Screenshots
-
-![Main](https://user-images.githubusercontent.com/31766075/30383189-ca377ca6-98a9-11e7-8c23-9538214a975f.png)
-![Menu](https://user-images.githubusercontent.com/31766075/30383181-c49c8732-98a9-11e7-9f95-f56fc0cb7931.png)
-![Form](https://user-images.githubusercontent.com/31766075/30383177-c4285aa6-98a9-11e7-84de-5550c0d1d159.png)
-
-## Multilingual + Rules
-
-- Multi-language support (MLS) via string resources and JSON interpolation.
-- Rules engine: define relevance and calculations in YAML under `assets/rule/` and reference them from form fields.
-
-See the sample rules in the repo and the OpenSRP documentation portal for detailed guidance.
-
-## Build From Source
-
-- Requirements: JDK 17, Android SDK 34 (build-tools 34.0.0).
-- Build AAR:
-
-```bash
-./gradlew :android-json-form-wizard:assembleRelease
-# Output: android-json-form-wizard/build/outputs/aar/android-json-form-wizard-release.aar
-```
-
-- Publish to local Maven (optional):
-
-```bash
-./gradlew :android-json-form-wizard:publishReleasePublicationToMavenLocal
-```
-
-## Contributing
-
-- Issues and PRs are welcome. Please keep changes focused and include tests where relevant.
-- Follow the existing code style and module structure.
-
-## License
-
-Apache License 2.0. See `LICENSE` for details.
-
----
-
-Legacy, highly detailed documentation (long JSON examples, full attribute tables, and advanced patterns) has been removed from the main README for clarity. If you need anything that is not obvious from the samples and code, check the sample modules, assets, and the OpenSRP documentation portal. For the previous long-form content, see README-LEGACY.md.
+      {
+        "key": "Child_Photo",
+        "openmrs_entity_parent": "",
+        "openmrs_entity": "",
+        "openmrs_entity_id": "",
+        "type": "choose_image",
+        "uploadButtonText": "Take a photo of the child"
+      },
+      {
+        "key": "gps",
+        "openmrs_entity_parent": "usual_residence",
+        "openmrs_entity": "person_address",
+        "openmrs_entity_id": "geopoint",
+        "openmrs_data_type": "text",
+        "type": "gps"
+      },
+      {
+        "key": "Home_Facility",
+        "openmrs_entity_parent": "",
+        "openmrs_entity": "",
+        "openmrs_entity_id": "",
+        "openmrs_data_type": "text",
+        "type": "tree",
+        "hint": "Child's home health facility",
+        "tree": [
+          {
+            "name": "Hilton",
+            "key": "hilton",
+            "level": "1",
+            "nodes": [
+                    {
+                      "name": "Sarova",
+                      "key": "sarova"
+                    }
+                  ]
+                },
+                {
+                  "name": "Double tree",
+                  "key": "double_tree"
+                }
+              ],
+              "default": "Hilton",
+              "v_required": {
+                "value": false,
+                "err": "Please enter the child's home facility"
+          }
+      },
+      {
+        "key": "ZEIR_ID",
+        "openmrs_entity_parent": "",
+        "openmrs_entity": "person_identifier",
+        "openmrs_entity_id": "ZEIR_ID",
+        "type": "barcode",
+        "barcode_type": "qrcode",
+        "hint": "Child's ZEIR ID *",
+        "scanButtonText": "Scan QR Code",
+        "value": "0",
+        "v_numeric": {
+          "value": "true",
+          "err": "Please enter a valid ID"
+        },
+        "v_required": {
+          "value": "true",
+          "err": "Please enter the Child's ZEIR ID"
+        }
+      },
+      {
         "key": "Child_Register_Card_Number",
         "openmrs_entity_parent": "",
         "openmrs_entity": "person_attribute",
