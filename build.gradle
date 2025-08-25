@@ -14,7 +14,10 @@ buildscript {
 // Ensure all projects have correct coordinates
 allprojects { proj ->
     proj.version = VERSION_NAME
-    proj.group = GROUP
+    // Do not force group for the library module; it publishes under the Central namespace
+    if (proj.name != 'android-json-form-wizard') {
+        proj.group = GROUP
+    }
 }
 
 configure(allprojects) { project ->
@@ -31,7 +34,7 @@ configure(allprojects) { project ->
 project.ext.preDexLibs = !project.hasProperty('disablePreDex')
 subprojects {
 
-    group = 'org.smartregister'
+    // Keep default group for app/test modules only; library overrides its own group
 
     ext.androidToolsBuildGradle = '8.5.2'
     ext.androidBuildToolsVersion = '34.0.0'

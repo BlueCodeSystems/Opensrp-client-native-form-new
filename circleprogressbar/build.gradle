@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 android {
     namespace "com.emredavarci.circleprogressbar"
@@ -25,4 +27,110 @@ android {
 
 dependencies {
     // No external deps required for this local module stub
+}
+
+// Publishing coordinates for Maven Central (GitHub namespace)
+group = "io.github.bluecodesystems"
+version = "1.0.0"
+
+// Generate sources.jar for release variant
+android {
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+        }
+    }
+}
+
+// Minimal javadoc jar placeholder (Central requires it)
+tasks.register("javadocJar", Jar) {
+    archiveClassifier.set("javadoc")
+    from(layout.projectDirectory.dir("empty-javadoc"))
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create("release", MavenPublication) {
+                def rel = components.findByName('release') ?: components.findByName('default')
+                if (rel != null) {
+                    from rel
+                } else {
+                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                }
+                artifact tasks.named("javadocJar")
+                artifactId = "circleprogressbar"
+
+                pom {
+                    name.set("CircleProgressbar (BlueCode fork)")
+                    description.set("BlueCode-maintained Android circular progress bar library")
+                    url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
+                    licenses {
+                        license {
+                            name.set("Apache-2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("andrel")
+                            name.set("Andre Lesa")
+                            email.set("engineering@bluecodeltd.org")
+                        }
+                    }
+                    scm {
+                        connection.set("scm:git:git://github.com/BlueCodeSystems/Opensrp-client-native-form-new.git")
+                        developerConnection.set("scm:git:ssh://github.com:BlueCodeSystems/Opensrp-client-native-form-new.git")
+                        url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
+                    }
+                }
+            }
+        }
+        repositories {
+            if ((project.findProperty('centralBundle')?.toString()?.toBoolean()) == true) {
+                maven {
+                    name = "CentralBundle"
+                    url = layout.buildDirectory.dir("central-bundle")
+                }
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    signing {
+        def taskNames = gradle.startParameter.taskNames
+        def isMavenLocal = taskNames.any { it.contains('publishToMavenLocal') }
+        def skip = project.findProperty('skipSigning')?.toString()?.toBoolean() ?: false
+        def useCmd = project.findProperty('useGpgCmd')?.toString()?.toBoolean() ?: false
+
+        required {
+            !isMavenLocal && !skip && (
+                project.findProperty('signing.keyId') ||
+                project.findProperty('signingKey') ||
+                useCmd
+            )
+        }
+
+        if (useCmd) {
+            useGpgCmd()
+        }
+
+        def inMemKey = project.findProperty('signingKey')
+        def inMemPass = project.findProperty('signingPassword')
+        if (inMemKey && inMemPass) {
+            useInMemoryPgpKeys(inMemKey.toString(), inMemPass.toString())
+        }
+
+        sign(publishing.publications['release'])
+    }
+}
+
+// Zip the local Central bundle repository for upload in the Central Portal UI
+tasks.register("zipCentralBundle", Zip) {
+    dependsOn tasks.matching { it.name == 'publishReleasePublicationToCentralBundleRepository' }
+    from(layout.buildDirectory.dir("central-bundle"))
+    destinationDirectory = layout.buildDirectory.dir("distributions")
+    archiveBaseName.set("central-bundle-circleprogressbar")
+    archiveVersion.set(project.version)
 }

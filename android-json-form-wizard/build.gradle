@@ -19,6 +19,10 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
+// Override groupId and version for this fork's publication
+group = "io.github.bluecodesystems"
+version = project.VERSION_NAME
+
 android {
     compileSdk androidCompileSdkVersion
 
@@ -31,6 +35,9 @@ android {
         versionName project.VERSION_NAME
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Expose VERSION_NAME to BuildConfig for library consumers
+        buildConfigField "String", "VERSION_NAME", "\"${project.VERSION_NAME}\""
 
     }
 
@@ -56,6 +63,11 @@ android {
         resources {
             excludes += 'META-INF/DEPENDENCIES'
         }
+    }
+
+    // Generate BuildConfig for library (AGP 8 disables it by default)
+    buildFeatures {
+        buildConfig = true
     }
 
     // Enable publishing of the release variant and attach sources
@@ -85,7 +97,7 @@ repositories {
 }
 
 dependencies {
-    implementation('org.smartregister:opensrp-client-simprints:1.1.0-SNAPSHOT@aar') {
+    implementation('io.github.bluecodesystems:opensrp-client-simprints:1.1.0@aar') {
         transitive = true
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'design'
@@ -94,7 +106,8 @@ dependencies {
     // Prefer a local patched Material AAR if provided; remove remote dependency to avoid AAPT issues
     implementation 'com.github.johnkil.print:print:1.3.1'
     implementation 'com.github.rey5137:material:1.3.1'
-    implementation 'org.smartregister:opensrp-client-materialedittext:2.1.6-SNAPSHOT'
+    // Use the upgraded MaterialEditText fork published under BlueCode
+    implementation 'io.github.bluecodesystems:materialedittext:3.1.6'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
@@ -119,7 +132,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
 
-    implementation 'org.smartregister:opensrp-client-utils:0.0.6-SNAPSHOT'
+    // Use the upgraded OpenSRP client utils under BlueCode, release version
+    implementation 'io.github.bluecodesystems:opensrp-client-utils:0.0.6'
     implementation 'androidx.test:core:1.4.0'
 
     def easyRulesVersion = '3.4.0'
@@ -134,8 +148,8 @@ dependencies {
     implementation fileTree(dir: "$projectDir/libs", include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
     implementation fileTree(dir: rootProject.projectDir, include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
 
-    // Use local module of CircleProgressbar
-    implementation project(':circleprogressbar')
+    // Use published CircleProgressbar package under BlueCode
+    implementation 'io.github.bluecodesystems:circleprogressbar:1.0.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
 
     // CircleProgressbar will be picked up via fileTree above if present locally
@@ -206,111 +220,166 @@ coveralls {
 }
 
 
-// Modern Maven publishing configuration (replaces legacy maven plugin)
-afterEvaluate { p ->
-    def pomName = p.findProperty('POM_SETTING_NAME') ?: p.name
-    def pomDesc = p.findProperty('POM_SETTING_DESCRIPTION') ?: ''
-    def pomUrl = p.findProperty('POM_SETTING_URL') ?: ''
-    def pomScmUrl = p.findProperty('POM_SETTING_SCM_URL') ?: ''
-    def pomScmConn = p.findProperty('POM_SETTING_SCM_CONNECTION') ?: ''
-    def pomScmDevConn = p.findProperty('POM_SETTING_SCM_DEV_CONNECTION') ?: ''
-    def pomLicenseName = p.findProperty('POM_SETTING_LICENCE_NAME') ?: 'The Apache Software License, Version 2.0'
-    def pomLicenseUrl = p.findProperty('POM_SETTING_LICENCE_URL') ?: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    def pomLicenseDist = p.findProperty('POM_SETTING_LICENCE_DIST') ?: 'repo'
-    def pomDevId = p.findProperty('POM_SETTING_DEVELOPER_ID') ?: ''
-    def pomDevName = p.findProperty('POM_SETTING_DEVELOPER_NAME') ?: ''
-    def artifactIdVal = p.findProperty('POM_SETTING_ARTIFACT_ID') ?: p.name
-    def packagingVal = p.findProperty('POM_SETTING_PACKAGING') ?: 'aar'
+// ---- javadoc.jar placeholder for Android ----
+// Maven Central requires a javadoc jar. For Android, publish an empty one or use Dokka.
+tasks.register("javadocJar", Jar) {
+    archiveClassifier.set("javadoc")
+    from(layout.projectDirectory.dir("empty-javadoc"))
+}
 
-    // Default to local publishing unless -PmavenLocal=false
-    def mavenLocalFlag = p.hasProperty('mavenLocal') ? p.property('mavenLocal').toString().toBoolean() : true
-    def isRelease = !(p.VERSION_NAME as String).contains('SNAPSHOT')
-    def sonatypeRepositoryURL = isRelease ?
-            (p.hasProperty('RELEASE_REPOSITORY_URL') ? p.property('RELEASE_REPOSITORY_URL') : 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') :
-            (p.hasProperty('SNAPSHOT_REPOSITORY_URL') ? p.property('SNAPSHOT_REPOSITORY_URL') : 'https://oss.sonatype.org/content/repositories/snapshots/')
-
-    // Optional Javadoc jar from existing javadoc task if available
-    tasks.register('androidJavadocsJar', Jar) {
-        dependsOn tasks.named('javadoc')
-        archiveClassifier.set('javadoc')
-        from tasks.named('javadoc').get().destinationDir
-    }
-
+// Maven Central publishing configuration (OSSRH s01)
+afterEvaluate {
     publishing {
         publications {
-            create('release', MavenPublication) {
-                groupId = p.group
-                artifactId = artifactIdVal
-                version = p.VERSION_NAME
-
-                // Publish the AAR from the release component when available
-                def relComp = p.components.findByName('release') ?: p.components.findByName('default')
+            create("release", MavenPublication) {
+                def relComp = components.findByName('release') ?: components.findByName('default')
                 if (relComp != null) {
                     from relComp
                 } else {
-                    // Fallback: attach the generated AAR directly
-                    def aarPath = "$buildDir/outputs/aar/${p.name}-release.aar"
-                    artifact(aarPath)
+                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
+                }
+                artifact tasks.named("javadocJar")
+                artifactId = "opensrp-client-native-form-new"
+
+                // For Central bundle releases, strip SNAPSHOT and local module deps from the published POM
+                if ((project.findProperty('centralRelease')?.toString()?.toBoolean()) == true) {
+                    pom.withXml {
+                        def n = asNode()
+                        def deps = n.get('dependencies')?.getAt(0)
+                        if (deps) {
+                            deps.children().removeAll { d ->
+                                def aid = d.artifactId?.text()
+                                def ver = d.version?.text()
+                                ver?.endsWith('SNAPSHOT') || ['circleprogressbar','opensrp-client-simprints','opensrp-client-materialedittext','opensrp-client-utils'].contains(aid)
+                            }
+                        }
+                    }
                 }
 
-                // Attach javadoc jar if it exists
-                artifact tasks.named('androidJavadocsJar')
-
                 pom {
-                    name.set(pomName)
-                    description.set(pomDesc)
-                    url.set(pomUrl)
-                    packaging = packagingVal
+                    name.set("OpenSRP Client Native Form (BlueCode fork)")
+                    description.set("BlueCode-maintained fork of the OpenSRP native form library")
+                    url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
                     licenses {
                         license {
-                            name.set(pomLicenseName)
-                            url.set(pomLicenseUrl)
-                            distribution.set(pomLicenseDist)
+                            name.set("Apache-2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                         }
                     }
                     developers {
                         developer {
-                            id.set(pomDevId)
-                            name.set(pomDevName)
+                            id.set("andrel")
+                            name.set("Andre Lesa")
+                            email.set("engineering@bluecodeltd.org")
                         }
                     }
                     scm {
-                        url.set(pomScmUrl)
-                        connection.set(pomScmConn)
-                        developerConnection.set(pomScmDevConn)
+                        connection.set("scm:git:git://github.com/BlueCodeSystems/Opensrp-client-native-form-new.git")
+                        developerConnection.set("scm:git:ssh://github.com:BlueCodeSystems/Opensrp-client-native-form-new.git")
+                        url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
                     }
                 }
             }
         }
         repositories {
-            if (mavenLocalFlag) {
-                mavenLocal()
-            } else {
+            maven {
+                name = "OSSRH"
+                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = findProperty("ossrhUsername") as String
+                    password = findProperty("ossrhPassword") as String
+                }
+            }
+            // Optional local file-based repository to create a Central-compatible bundle
+            if ((project.findProperty('centralBundle')?.toString()?.toBoolean()) == true) {
                 maven {
-                    url = uri(sonatypeRepositoryURL)
-                    credentials {
-                        username = p.findProperty('sonatypeUsername') ?: ''
-                        password = p.findProperty('sonatypePassword') ?: ''
-                    }
+                    name = "CentralBundle"
+                    url = layout.buildDirectory.dir("central-bundle")
                 }
             }
         }
     }
+}
 
+afterEvaluate {
     signing {
-        required { isRelease && gradle.taskGraph.hasTask('publish') }
-        sign publishing.publications
+        // Sign only when not publishing to Maven Local and when keys are provided
+        def taskNames = gradle.startParameter.taskNames
+        def isMavenLocal = taskNames.any { it.contains('publishToMavenLocal') }
+        def skip = project.findProperty('skipSigning')?.toString()?.toBoolean() ?: false
+        def useCmd = project.findProperty('useGpgCmd')?.toString()?.toBoolean() ?: false
+
+        required {
+            !isMavenLocal && !skip && (
+                project.findProperty('signing.keyId') ||
+                project.findProperty('signingKey') ||
+                useCmd
+            )
+        }
+
+        if (useCmd) {
+            // Use local GnuPG for signing (configure keyName/passphrase in ~/.gradle/gradle.properties)
+            useGpgCmd()
+        }
+
+        def inMemKey = project.findProperty('signingKey')
+        def inMemPass = project.findProperty('signingPassword')
+        if (inMemKey && inMemPass) {
+            useInMemoryPgpKeys(inMemKey.toString(), inMemPass.toString())
+        }
+
+        sign(publishing.publications['release'])
     }
 }
 
-task javadoc(type: Javadoc) {
-    failOnError false
-    def mainSrc = "$project.projectDir/src/main/java"
-    source = files([mainSrc])
-    // Compute classpath at execution time to avoid missing configuration errors
-    doFirst {
-        def boot = project.files(android.bootClasspath)
-        def compCp = configurations.findByName('releaseCompileClasspath') ?: configurations.findByName('debugCompileClasspath') ?: files()
-        classpath = files(boot, compCp)
+// Optionally generate legacy checksums for portal validators
+tasks.register("generateCentralBundleChecksums") {
+    dependsOn tasks.matching { it.name == 'publishReleasePublicationToCentralBundleRepository' }
+    doLast {
+        def repoDir = layout.buildDirectory.dir("central-bundle").get().asFile
+        if (!repoDir.exists()) return
+        repoDir.eachFileRecurse { f ->
+            if (f.isFile() && !(f.name.endsWith('.md5') || f.name.endsWith('.sha1') || f.name.endsWith('.asc'))) {
+                def md5 = java.security.MessageDigest.getInstance('MD5')
+                def sha1 = java.security.MessageDigest.getInstance('SHA-1')
+                f.withInputStream { is ->
+                    byte[] buf = new byte[8192]
+                    int r
+                    while ((r = is.read(buf)) > 0) {
+                        md5.update(buf, 0, r)
+                        sha1.update(buf, 0, r)
+                    }
+                }
+                def toHex = { bytes -> bytes.collect { String.format('%02x', it) }.join() }
+                new File(f.parentFile, f.name + '.md5').text = toHex(md5.digest())
+                new File(f.parentFile, f.name + '.sha1').text = toHex(sha1.digest())
+            }
+        }
+    }
+}
+
+// Zip the local Central bundle repository for upload in the Central Portal UI
+tasks.register("zipCentralBundle", Zip) {
+    dependsOn tasks.named('generateCentralBundleChecksums')
+    // Only include the current coordinates/version, but preserve Maven layout
+    def groupPath = project.group.toString().replace('.', '/')
+    def artifact = 'opensrp-client-native-form-new'
+    def versionDir = "${groupPath}/${artifact}/${project.version}/**"
+    from(layout.buildDirectory.dir("central-bundle")) {
+        include versionDir
+    }
+    destinationDirectory = layout.buildDirectory.dir("distributions")
+    archiveBaseName.set("central-bundle-opensrp-client-native-form-new")
+    archiveVersion.set(project.version)
+}
+
+// Helper: print path and files to verify POM exists
+tasks.register("printCentralBundleLayout") {
+    dependsOn tasks.matching { it.name == 'publishReleasePublicationToCentralBundleRepository' }
+    doLast {
+        def base = layout.buildDirectory.dir('central-bundle').get().asFile
+        def path = new File(base, project.group.toString().replace('.', '/') + "/opensrp-client-native-form-new/" + project.version)
+        println "Bundle path: ${path}"
+        if (path.exists()) path.eachFile { println it.name } else println "Bundle path not found"
     }
 }
