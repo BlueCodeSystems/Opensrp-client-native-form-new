@@ -1,0 +1,41 @@
+# Android/Java
+.gradle/
+/local.properties
+/.idea/
+*.iml
+*.ipr
+*.iws
+
+# macOS
+.DS_Store
+
+# Build outputs
+/build/
+**/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+
+# Artifacts
+*.apk
+*.aar
+*.aab
+
+# IDE/editor
+.vscode/
+
+# Legacy/other build dirs
+bin/
+gen/
+out/
+target/
+classes/
+tmp/
+.settings/
+.classpath
+.project
+
+# Coverage
+*.ec
+jacoco.exec
+**/jacoco.exec
