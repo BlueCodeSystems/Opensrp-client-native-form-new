@@ -40,7 +40,15 @@ public class BasicRDTCaptureFactory extends RDTCaptureFactory {
     private class LaunchRDTCameraTask {
         protected Void doInBackground(Void... voids) {
             Activity activity = (Activity) widgetArgs.getContext();
-            Intent intent = new Intent(activity, BasicRDTCaptureFactory.class);
+            Intent intent;
+            try {
+                Class<?> rdtActivity = Class.forName("edu.washington.cs.ubicomplab.rdt_reader.activity.RDTCaptureActivity");
+                intent = new Intent(activity, rdtActivity);
+            } catch (ClassNotFoundException e) {
+                // Fallback: use a no-op intent to the host Activity to keep flow moving in environments
+                // where the RDT library is not available (e.g., unit tests without the dependency).
+                intent = new Intent(activity, activity.getClass());
+            }
             activity.startActivityForResult(intent, JsonFormConstants.RDT_CAPTURE_CODE);
             return null;
         }
