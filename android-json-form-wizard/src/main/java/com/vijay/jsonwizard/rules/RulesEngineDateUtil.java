@@ -247,14 +247,12 @@ public class RulesEngineDateUtil {
     }
 
     public String getSecondaryValue(String value) {
-
-        if (value.contains(":")) {
-            String[] valArray = value.split(":");
-            return valArray[1];
-        } else {
-            return value;
+        if (value == null) return "";
+        int idx = value.indexOf(':');
+        if (idx >= 0) {
+            return idx < value.length() - 1 ? value.substring(idx + 1) : "";
         }
-
+        return value;
     }
 
     public long getTimeInMillis() {

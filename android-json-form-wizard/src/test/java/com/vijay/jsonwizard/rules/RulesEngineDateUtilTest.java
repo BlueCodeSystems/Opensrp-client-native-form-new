@@ -81,4 +81,11 @@ public class RulesEngineDateUtilTest extends BaseTest {
         Assert.assertEquals(Months.monthsBetween(date, LocalDate.now()).getMonths(), Integer.parseInt(rulesEngineDateUtil.formatDate(dateStringTest, "m")));
         Assert.assertEquals(Years.yearsBetween(date, LocalDate.now()).getYears(), Integer.parseInt(rulesEngineDateUtil.formatDate(dateStringTest, "y")));
     }
+
+    @Test
+    public void testGetSecondaryValueHandlesColonCases() {
+        Assert.assertEquals("done", rulesEngineDateUtil.getSecondaryValue("test:done"));
+        Assert.assertEquals("", rulesEngineDateUtil.getSecondaryValue("test:"));
+        Assert.assertEquals("value", rulesEngineDateUtil.getSecondaryValue("value"));
+    }
 }

@@ -75,14 +75,15 @@ public class RulesEngineHelper {
         return rulesEngineDateUtil.getDateTimeToday();
     }
 
-    //A secondary value has the format key:name e.g. ultrasound_done:yes
+    // A secondary value has the format key:name e.g. ultrasound_done:yes
     public String getSecondaryValue(String value) {
-        if (value.contains(":")) {
-            String[] valArray = value.split(":");
-            return valArray[1];
-        } else {
-            return value;
+        if (value == null) return "";
+        int idx = value.indexOf(':');
+        if (idx >= 0) {
+            // Return empty string if colon is last character (no value part)
+            return idx < value.length() - 1 ? value.substring(idx + 1) : "";
         }
+        return value;
     }
 
     public String ifNull(String value, String defaultIfNull) {

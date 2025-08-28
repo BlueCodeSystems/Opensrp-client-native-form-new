@@ -76,4 +76,11 @@ public class RulesEngineHelperTest extends BaseTest {
 
     }
 
+    @Test
+    public void testGetSecondaryValueHandlesColonCases() {
+        assertEquals("yes", helper.getSecondaryValue("ultrasound_done:yes"));
+        assertEquals("", helper.getSecondaryValue("ultrasound_done:"));
+        assertEquals("plain", helper.getSecondaryValue("plain"));
+    }
+
 }
