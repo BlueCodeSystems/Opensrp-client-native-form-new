@@ -303,7 +303,8 @@ public class NumericDatePicker extends DatePicker {
 
         inflate(getContext(), R.layout.number_picker_view, this);
 
-        dayPicker = initNumericPicker(R.id.day, 1, 30);
+        int maxDayForMonth = NumericDatePickerHelper.getDaysInMonth(todayMonth, NumericDatePickerHelper.isLeapYear(todayYear));
+        dayPicker = initNumericPicker(R.id.day, 1, maxDayForMonth);
 
         monthPicker = initNumericPicker(R.id.month, 1, 12);
 
@@ -625,8 +626,9 @@ public class NumericDatePicker extends DatePicker {
         boolean isScroll = true;
 
         if (numberPicker.getId() == R.id.year) {
-
-            isScroll = !(numberPicker.getValue() == maxYear || numberPicker.getValue() == minYear);
+            boolean atMin = (minDate > 0) && numberPicker.getValue() == minYear;
+            boolean atMax = (maxDate > 0) && numberPicker.getValue() == maxYear;
+            isScroll = !(atMin || atMax);
 
         } else if (numberPicker.getId() == R.id.month) {
             isScroll = !(isMinMonthEdge() || isMaxMonthEdge());
@@ -641,19 +643,19 @@ public class NumericDatePicker extends DatePicker {
     }
 
     private boolean isMinMonthEdge() {
-        return getYear() <= minYear && monthPicker.getValue() == (minMonth + 1);
+        return (minDate > 0) && getYear() <= minYear && monthPicker.getValue() == (minMonth + 1);
     }
 
     private boolean isMaxMonthEdge() {
-        return getYear() >= maxYear && monthPicker.getValue() == (maxMonth + 1);
+        return (maxDate > 0) && getYear() >= maxYear && monthPicker.getValue() == (maxMonth + 1);
     }
 
     private boolean isMinDayEdge() {
-        return getYear() <= minYear && getMonth() <= minMonth && dayPicker.getValue() == minDay;
+        return (minDate > 0) && getYear() <= minYear && getMonth() <= minMonth && dayPicker.getValue() == minDay;
     }
 
     private boolean isMaxDayEdge() {
-        return getYear() >= maxYear && getMonth() >= maxMonth && dayPicker.getValue() == maxDay;
+        return (maxDate > 0) && getYear() >= maxYear && getMonth() >= maxMonth && dayPicker.getValue() == maxDay;
     }
 
     private int getMaxDayForSelectedDate() {
