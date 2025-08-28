@@ -53,6 +53,10 @@ public class FormRollbackDialogUtil {
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
                 rollbackDialogCallback.onCancelClicked();
+                // Ensure the hosting view knows the dialog is no longer visible
+                if (context instanceof ClientFormContract.View) {
+                    ((ClientFormContract.View) context).setVisibleFormErrorAndRollbackDialog(false);
+                }
             }
         });
 

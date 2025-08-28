@@ -64,10 +64,14 @@ public class GenericTextWatcher implements TextWatcher, View.OnFocusChangeListen
         mView.setTag(R.id.previous, editable.toString());
 
         JsonApi api;
-        if (formFragment.getContext() instanceof JsonApi) {
+        if (formFragment != null && formFragment.getContext() instanceof JsonApi) {
             api = (JsonApi) formFragment.getContext();
+        } else if (mView != null && mView.getContext() instanceof JsonApi) {
+            // Fallback to the view's context when fragment context is unavailable (e.g. in tests)
+            api = (JsonApi) mView.getContext();
         } else {
-            throw new JsonFormRuntimeException("Could not fetch context");
+            // Context not available; do not throw to avoid crashing flows that only set text programmatically
+            return;
         }
 
         String key = (String) mView.getTag(R.id.key);

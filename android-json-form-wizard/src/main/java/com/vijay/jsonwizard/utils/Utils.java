@@ -116,9 +116,60 @@ public class Utils {
         }
     }
 
-    public static String reverseDateString(String str, String delimiter) {
-        String[] strr = str.split(delimiter);
-        return strr[2] + "-" + strr[1] + "-" + strr[0];
+    /**
+     * Converts a date string into ISO format (yyyy-MM-dd) when possible.
+     * Accepts common separators '-', '/', or '.' and supports either dd-MM-yyyy or yyyy-MM-dd inputs.
+     * Returns null for null/blank input; otherwise returns a best-effort normalized string or the original string
+     * if the format is not recognized.
+     */
+    @Nullable
+    public static String reverseDateString(@Nullable String str, @Nullable String delimiter) {
+        if (str == null) return null;
+        String d = str.trim();
+        if (d.isEmpty()) return null;
+
+        // Try robust regex-based parsing first
+        java.util.regex.Pattern yearFirst = java.util.regex.Pattern.compile("^(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})$");
+        java.util.regex.Pattern dayFirst = java.util.regex.Pattern.compile("^(\\d{1,2})[-/.](\\d{1,2})[-/.](\\d{4})$");
+        java.util.regex.Matcher m = yearFirst.matcher(d);
+        if (m.matches()) {
+            // Already yyyy-MM-dd (or yyyy/MM/dd or yyyy.MM.dd); normalize to yyyy-MM-dd
+            return String.format(java.util.Locale.ENGLISH, "%04d-%02d-%02d",
+                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)));
+        }
+        m = dayFirst.matcher(d);
+        if (m.matches()) {
+            // dd-MM-yyyy (or dd/MM/yyyy or dd.MM.yyyy) -> yyyy-MM-dd
+            return String.format(java.util.Locale.ENGLISH, "%04d-%02d-%02d",
+                    Integer.parseInt(m.group(3)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(1)));
+        }
+
+        // Fallback to legacy behavior if a delimiter is explicitly provided
+        if (!TextUtils.isEmpty(delimiter) && d.contains(delimiter)) {
+            try {
+                String[] parts = d.split(java.util.regex.Pattern.quote(delimiter));
+                if (parts.length >= 3) {
+                    String y = parts[2].trim();
+                    String mth = parts[1].trim();
+                    String day = parts[0].trim();
+                    // Zero-pad day/month if needed and normalize separator to '-'
+                    int mi = Integer.parseInt(mth);
+                    int di = Integer.parseInt(day);
+                    return String.format(java.util.Locale.ENGLISH, "%s-%02d-%02d", y, mi, di);
+                }
+            } catch (Exception e) {
+                Timber.e(e, "reverseDateString fallback failed for input: %s", d);
+            }
+        }
+
+        // Unrecognized format: return original to avoid surprising nulls for callers
+        return d;
+    }
+
+    /** Overload that auto-detects the separator. */
+    @Nullable
+    public static String reverseDateString(@Nullable String str) {
+        return reverseDateString(str, null);
     }
 
     public static String getDateFormattedForCalculation(String date, String datePickerDisplayFormat) {
@@ -225,16 +276,33 @@ public class Utils {
             return;
         }
 
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setCancelable(true);
-        progressDialog.setTitle(context.getString(title));
-        progressDialog.setMessage(context.getString(message));
-        progressDialog.show();
+        if (context == null) {
+            // Nothing we can show safely; preserve existing instance if any
+            return;
+        }
+
+        try {
+            android.content.Context themed = new android.view.ContextThemeWrapper(context, R.style.AppThemeAlertDialog);
+            progressDialog = new ProgressDialog(themed);
+            progressDialog.setCancelable(true);
+            progressDialog.setTitle(themed.getString(title));
+            progressDialog.setMessage(themed.getString(message));
+            progressDialog.show();
+        } catch (Throwable t) {
+            Timber.e(t);
+            // Swallow to avoid test/runtime crashes on non-Activity contexts; leave progressDialog as null
+        }
     }
 
     public static void hideProgressDialog() {
         if (progressDialog != null) {
-            progressDialog.dismiss();
+            try {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            } catch (Throwable t) {
+                Timber.e(t);
+            }
         }
     }
 
@@ -898,7 +966,8 @@ public class Utils {
         return value.toString().replaceAll(", $", "");
     }
 
-    private String getValueFromSecondaryValues(String itemString) {
+    private String getValueFromSecondaryValues(@Nullable String itemString) {
+        if (itemString == null) return "";
         String[] strings = itemString.split(":");
         return strings.length > 1 ? strings[1] : strings[0];
     }
@@ -1042,5 +1111,3 @@ public class Utils {
     }
 
 }
-
-

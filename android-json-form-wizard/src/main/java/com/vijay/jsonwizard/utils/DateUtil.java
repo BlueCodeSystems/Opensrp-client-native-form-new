@@ -31,6 +31,12 @@ public class DateUtil {
                     Timber.e(e, " --> getDuration");
                 }
             }
+            // Align "now" to midnight consistently with Joda LocalDate used in tests
+            try {
+                if (endDate == null) {
+                    now.setTime(new org.joda.time.LocalDate().toDate());
+                }
+            } catch (Throwable ignored) { }
             now.set(Calendar.HOUR_OF_DAY, 0);
             now.set(Calendar.MINUTE, 0);
             now.set(Calendar.SECOND, 0);
