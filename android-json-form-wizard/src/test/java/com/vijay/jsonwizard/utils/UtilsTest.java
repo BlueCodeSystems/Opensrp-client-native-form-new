@@ -341,6 +341,25 @@ public class UtilsTest extends BaseTest {
     }
 
     @Test
+    public void testReverseDateStringHandlesNullAndBlank() {
+        Assert.assertNull(Utils.reverseDateString(null, "-"));
+        Assert.assertNull(Utils.reverseDateString("   ", "-"));
+    }
+
+    @Test
+    public void testReverseDateStringParsesVariousSeparators() {
+        Assert.assertEquals("1997-12-20", Utils.reverseDateString("1997/12/20"));
+        Assert.assertEquals("1997-01-02", Utils.reverseDateString("02/01/1997"));
+        Assert.assertEquals("1997-01-02", Utils.reverseDateString("1997.1.2"));
+        Assert.assertEquals("1997-01-02", Utils.reverseDateString("2-1-1997"));
+    }
+
+    @Test
+    public void testReverseDateStringUnrecognizedReturnsOriginal() {
+        Assert.assertEquals("20-12", Utils.reverseDateString("20-12"));
+    }
+
+    @Test
     public void getDateForCalculationShouldReturnCorrectDateString() {
         String date = "20-12-2021";
         Assert.assertEquals("20-12-2021", Utils.getDateFormattedForCalculation(date, null));
@@ -535,4 +554,3 @@ public class UtilsTest extends BaseTest {
 
         }
     }
-

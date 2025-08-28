@@ -8,6 +8,7 @@ import com.vijay.jsonwizard.constants.JsonFormConstants;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnit;
@@ -33,6 +34,14 @@ public abstract class BaseTest {
     protected static final String DEFAULT_TEST_MESSAGE = "Native Form Test";
 
     protected static long TIMEOUT=2000;
+
+    @BeforeClass
+    public static void baseBeforeClass() {
+        // Stabilize timezone/locale for date-sensitive tests under Robolectric/JDK17
+        java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone("UTC"));
+        org.joda.time.DateTimeZone.setDefault(org.joda.time.DateTimeZone.UTC);
+        java.util.Locale.setDefault(java.util.Locale.ENGLISH);
+    }
 
     public Intent getJsonFormActivityIntent() {
         Intent intent = new Intent();
