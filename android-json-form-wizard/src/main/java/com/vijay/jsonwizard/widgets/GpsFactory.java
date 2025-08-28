@@ -243,8 +243,9 @@ public class GpsFactory implements FormWidgetFactory {
 
             String[] coordinateElements = coordinateData.split(" ");
 
-            //loops to fill textViews with values supplied
-            for (int i = 0; i < coordinateElements.length; i++) {
+            // Fill up to the number of available fields; ignore any extra parts safely
+            int count = Math.min(coordinateElements.length, views.length);
+            for (int i = 0; i < count; i++) {
                 views[i].setText(getText(context, coordinateElements[i], stringIds[i]));
             }
 
