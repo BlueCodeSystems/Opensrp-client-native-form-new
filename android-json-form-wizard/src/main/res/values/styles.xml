@@ -8,6 +8,9 @@
         <item name="colorButtonNormal">@color/primary</item>
     </style>
 
+    <!-- Alias for tests and compatibility -->
+    <style name="AppTheme" parent="NativeFormsAppTheme" />
+
     <style name="AppTheme.DarkToolbar" parent="NativeFormsAppTheme">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
