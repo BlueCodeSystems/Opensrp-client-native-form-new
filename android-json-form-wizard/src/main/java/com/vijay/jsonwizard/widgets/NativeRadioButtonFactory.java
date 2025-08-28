@@ -301,7 +301,7 @@ public class NativeRadioButtonFactory implements FormWidgetFactory {
                         ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(constraintLayout.getLayoutParams());
                         layoutParams.topToBottom = R.id.label_text;
                         layoutParams.leftMargin = FormUtils.dpToPixels(formFragmentView.getContext(), 8);
-                        constraintLayout.addView(errorTextView, new ConstraintLayout.LayoutParams(layoutParams));
+                        constraintLayout.addView(errorTextView, layoutParams);
                     }
                     errorTextView.setVisibility(View.VISIBLE);
                     errorTextView.setText(error);
