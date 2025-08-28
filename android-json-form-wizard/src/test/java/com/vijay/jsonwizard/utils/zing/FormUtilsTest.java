@@ -110,7 +110,7 @@ public class FormUtilsTest extends BaseTest {
         int expected = 30;
         PowerMockito.mockStatic(TextUtils.class);
         PowerMockito.mockStatic(TypedValue.class);
-        PowerMockito.when(!TextUtils.isEmpty(spString)).thenReturn(false);
+        PowerMockito.when(TextUtils.isEmpty(spString)).thenReturn(false);
         PowerMockito.when(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, expected, displayMetrics)).thenReturn(Float
                 .valueOf(expected));
 
@@ -236,7 +236,7 @@ public class FormUtilsTest extends BaseTest {
         Mockito.doReturn(displayMetrics).when(resources).getDisplayMetrics();
         String dpString = "30dp";
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(dpString)).thenReturn(false);
+        PowerMockito.when(TextUtils.isEmpty(dpString)).thenReturn(false);
 
         Float dp = 30f;
         int expected = 150;
@@ -260,7 +260,7 @@ public class FormUtilsTest extends BaseTest {
         String pxString = "30px";
         int expected = 30;
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(pxString)).thenReturn(false);
+        PowerMockito.when(TextUtils.isEmpty(pxString)).thenReturn(false);
 
         int px = FormUtils.getValueFromSpOrDpOrPx(pxString, context);
         Assert.assertEquals(expected, px);
@@ -277,7 +277,7 @@ public class FormUtilsTest extends BaseTest {
         String string = "String";
         int expected = 20;
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(string)).thenReturn(false);
+        PowerMockito.when(TextUtils.isEmpty(string)).thenReturn(false);
 
         int px = FormUtils.getValueFromSpOrDpOrPx(string, context);
         Assert.assertEquals(expected, px);
@@ -292,7 +292,7 @@ public class FormUtilsTest extends BaseTest {
         String string = "";
         int expected = 0;
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(string)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(string)).thenReturn(true);
 
         int px = FormUtils.getValueFromSpOrDpOrPx(string, context);
         Assert.assertEquals(expected, px);
@@ -306,7 +306,7 @@ public class FormUtilsTest extends BaseTest {
 
         int expected = 0;
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
 
         int px = FormUtils.getValueFromSpOrDpOrPx(null, context);
         Assert.assertEquals(expected, px);
@@ -319,7 +319,7 @@ public class FormUtilsTest extends BaseTest {
         String itemType = "check_box";
 
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
         Map<String, String> value = formUtils.addAssignedValue(itemKey, optionKey, keyValue, itemType, itemText);
         Assert.assertNotNull(value);
 
@@ -336,7 +336,7 @@ public class FormUtilsTest extends BaseTest {
         String itemType = "native_radio";
 
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
         Map<String, String> value = formUtils.addAssignedValue(itemKey, optionKey, keyValue, itemType, itemText);
         Assert.assertNotNull(value);
 
@@ -353,7 +353,7 @@ public class FormUtilsTest extends BaseTest {
         String itemType = "date_picker";
 
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
         Map<String, String> value = formUtils.addAssignedValue(itemKey, optionKey, keyValue, itemType, itemText);
         Assert.assertNotNull(value);
 

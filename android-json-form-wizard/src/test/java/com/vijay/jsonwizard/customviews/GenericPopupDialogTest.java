@@ -29,7 +29,7 @@ public class GenericPopupDialogTest extends BaseTest {
     @Test
     public void testGetRadioButtonOptionsOpenMRSAttributes() throws Exception {
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
 
         String radioButtonItem = "{\"key\":\"respiratory_exam\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_entity_id\":\"165367AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"type\":\"native_radio\",\"label\":\"Respiratory exam\",\"label_text_style\":\"bold\",\"text_color\":\"#000000\",\"value\":\"3\",\"options\":[{\"key\":\"1\",\"text\":\"Not done\",\"openmrs_entity_parent\":\"165367AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"openmrs_entity\":\"concept\",\"openmrs_entity_id\":\"1118AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},{\"key\":\"2\",\"text\":\"Normal\",\"openmrs_entity_parent\":\"165367AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"openmrs_entity\":\"concept\",\"openmrs_entity_id\":\"1115AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},{\"key\":\"3\",\"text\":\"Abnormal\",\"openmrs_entity_parent\":\"165367AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"openmrs_entity\":\"concept\",\"openmrs_entity_id\":\"1116AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"}]}";
         JSONObject itemJson = new JSONObject(radioButtonItem);
@@ -44,7 +44,7 @@ public class GenericPopupDialogTest extends BaseTest {
     @Test
     public void testGetCheckBoxOptionsOpenMRSAttributes() throws Exception {
         PowerMockito.mockStatic(TextUtils.class);
-        PowerMockito.when(!TextUtils.isEmpty(null)).thenReturn(true);
+        PowerMockito.when(TextUtils.isEmpty(null)).thenReturn(true);
 
         String checkboxItem = "{\n" +
                 "      \"key\": \"respiratory_exam_abnormal\",\n" +
