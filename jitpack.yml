@@ -1,0 +1,6 @@
+jdk:
+  - openjdk17
+install:
+  - ./gradlew :android-json-form-wizard:assembleRelease -x test --no-daemon --stacktrace
+env:
+  CI: true
