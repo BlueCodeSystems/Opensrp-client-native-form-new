@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [3.1.5] - 2025-09-26
+### Changed
+- Adopt Gradle 8.7 and Android Gradle Plugin 8.6.0 for the library build.
+
+### Fixed
+- Allow the `circleprogressbar` publication to skip signing when credentials are absent.
+
+### Documentation
+- Rewrite the README with updated overview, install, and usage guidance.
+- Add managed JitPack badges for latest release, tag, and master snapshot.
+
+### Testing
+- Replace PowerMock usages with lightweight reflection helpers in unit tests.
+
 - Allow multiple installations side by side for opensrp apps that use the select image function
     - Starting Opensrp Client Native Form library Snapshot Version *1.0.5-SNAPSHOT* and Release Version *1.0.3* from Any OpenSRP implementations utilizing the library should now specify the File Provider authority in the manifest as
      `android:authorities="${applicationId}.fileprovider"`

@@ -1,6 +1,6 @@
 <!-- JITPACK BADGES:START -->
 [![JitPack Latest](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new)
-[![Build for latest tag (v3.1.4)](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new/v3.1.4.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new/v3.1.4)
+[![Build for latest tag (v3.1.5)](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new/v3.1.5.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new/v3.1.5)
 [![master-SNAPSHOT](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new/master-SNAPSHOT.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new/master-SNAPSHOT)
 <!-- JITPACK BADGES:END -->
 
@@ -12,7 +12,7 @@ An Android library for building JSON-driven OpenSRP forms with wizard workflows,
 - Built and tested against JDK 17 as configured in `gradle.properties`.
 - Kotlin plugin is not applied; modules compile Java 8 sources via `android.compileOptions`.
 - No CI workflows are checked in—run Gradle locally or integrate with your preferred CI.
-- Current branch: `main` (checked out on September 26, 2025); latest tag: `v3.1.4`.
+- Current branch: `main` (checked out on September 26, 2025); latest tag: `v3.1.5`.
 
 ## Features
 - Define multi-step forms in JSON without hand-crafted layouts.
