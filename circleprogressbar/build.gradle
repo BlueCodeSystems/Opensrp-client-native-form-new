@@ -98,13 +98,12 @@ afterEvaluate {
         def isMavenLocal = taskNames.any { it.contains('publishToMavenLocal') }
         def skip = project.findProperty('skipSigning')?.toString()?.toBoolean() ?: false
         def useCmd = project.findProperty('useGpgCmd')?.toString()?.toBoolean() ?: false
+        def hasKeyRing = project.findProperty('signing.keyId') && project.findProperty('signing.secretKeyRingFile') && project.findProperty('signing.password')
+        def hasInMemoryKey = project.findProperty('signingKey') && project.findProperty('signingPassword')
+        def hasMaterial = (hasKeyRing || hasInMemoryKey || useCmd)
 
         required {
-            !isMavenLocal && !skip && (
-                project.findProperty('signing.keyId') ||
-                project.findProperty('signingKey') ||
-                useCmd
-            )
+            !isMavenLocal && !skip && hasMaterial
         }
 
         if (useCmd) {
@@ -117,7 +116,11 @@ afterEvaluate {
             useInMemoryPgpKeys(inMemKey.toString(), inMemPass.toString())
         }
 
-        sign(publishing.publications['release'])
+        if (!isMavenLocal && !skip && hasMaterial) {
+            sign(publishing.publications['release'])
+        } else {
+            logger.lifecycle("Skipping signing for ${project.path}: skipSigning=${skip}, hasMaterial=${hasMaterial}, isMavenLocal=${isMavenLocal}")
+        }
     }
 }
 
