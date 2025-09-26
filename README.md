@@ -1,3 +1,9 @@
+<!-- JITPACK BADGES:START -->
+[![JitPack Latest](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new)
+[![Build for latest tag (v3.1.4)](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new/v3.1.4.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new/v3.1.4)
+[![master-SNAPSHOT](https://jitpack.io/v/BlueCodeSystems/Opensrp-client-native-form-new/master-SNAPSHOT.svg)](https://jitpack.io/#BlueCodeSystems/Opensrp-client-native-form-new/master-SNAPSHOT)
+<!-- JITPACK BADGES:END -->
+
 # opensrp-client-native-form-new
 An Android library for building JSON-driven OpenSRP forms with wizard workflows, validation rules, and multilingual support.
 
