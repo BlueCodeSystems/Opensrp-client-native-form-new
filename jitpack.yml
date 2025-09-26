@@ -1,6 +1,12 @@
 jdk:
   - openjdk17
+before_install:
+  - echo "sdk.dir=$ANDROID_HOME" > local.properties
+  - yes | ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+  - ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;26.2.11394342" "platform-tools"
 install:
-  - ./gradlew :android-json-form-wizard:assembleRelease -x test --no-daemon --stacktrace
+  - chmod +x gradlew
+  - OWNER=$(git config --get remote.origin.url | sed -E 's#.*[:/ ]([^/]+)/[^/]+(\.git)?$#\1#'); VERSION=${VERSION:-0.0.1-SNAPSHOT}; echo "Using GROUP=com.github.${OWNER} VERSION=${VERSION} (skipSigning)"
+  - ./gradlew --no-daemon -x test -x lint -PskipSigning=true -PGROUP=com.github.${OWNER} -PVERSION_NAME=${VERSION} publishToMavenLocal
 env:
   CI: true

@@ -1,3 +1,44 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 rootProject.name = 'opensrp-client-native-form'
-// Include only actual modules present in the repo
-include ':android-json-form-wizard', ':sample', ':form_tester'
+
+include ':android-json-form-wizard', ':sample', ':form_tester', ':circleprogressbar'
+
+// Optional: include sibling builds when explicitly enabled to ease local development
+def sibling = { String path -> file(path)?.exists() }
+def useLocalSiblings = (gradle.startParameter.projectProperties['useLocalSiblings']
+        ?: System.getenv('USE_LOCAL_SIBLINGS'))?.toString()?.toBoolean() ?: false
+
+if (useLocalSiblings) {
+    if (sibling('../opensrp-client-core')) {
+        includeBuild('../opensrp-client-core') {
+            dependencySubstitution {
+                substitute(module('io.github.bluecodesystems:opensrp-client-core'))
+                        .using(project(':opensrp-client-core'))
+            }
+        }
+    }
+    if (sibling('../opensrp-client-utils')) {
+        includeBuild('../opensrp-client-utils') {
+            dependencySubstitution {
+                substitute(module('io.github.bluecodesystems:opensrp-client-utils'))
+                        .using(project(':opensrp-client-utils'))
+            }
+        }
+    }
+    if (sibling('../opensrp-client-configurable-views')) {
+        includeBuild('../opensrp-client-configurable-views') {
+            dependencySubstitution {
+                substitute(module('com.github.BlueCodeSystems:opensrp-client-configurable-views'))
+                        .using(project(':opensrp-client-configurable-views'))
+            }
+        }
+    }
+}

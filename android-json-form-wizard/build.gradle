@@ -1,44 +1,34 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "com.android.tools.build:gradle:$androidToolsBuildGradle"
-        classpath 'org.apache.commons:commons-lang3:3.12.0'
-    }
+plugins {
+    id 'com.android.library'
+    id 'maven-publish'
+    id 'signing'
+    id 'jacoco'
+    id 'com.github.kt3k.coveralls'
 }
-
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
-apply plugin: 'jacoco'
-apply plugin: 'com.github.kt3k.coveralls'
 
 jacoco {
-    toolVersion = "0.8.8"
+    toolVersion = '0.8.10'
 }
 
-// Override groupId and version for this fork's publication
-group = "io.github.bluecodesystems"
+group = 'io.github.bluecodesystems'
 version = project.VERSION_NAME
 
 android {
-    compileSdk androidCompileSdkVersion
-
-    // defaultPublishConfig is obsolete in newer AGP; use default variant publishing
+    namespace 'com.vijay.jsonwizard'
+    compileSdk 35
+    buildToolsVersion '35.0.0'
 
     defaultConfig {
-        minSdk androidMinSdkVersion
-        targetSdk androidTargetSdkVersion
+        minSdk 28
+        targetSdk 35
         versionCode Integer.parseInt(project.VERSION_CODE)
         versionName project.VERSION_NAME
-        multiDexEnabled true
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        buildConfigField 'String', 'VERSION_NAME', "\"${project.VERSION_NAME}\""
+    }
 
-        // Expose VERSION_NAME to BuildConfig for library consumers
-        buildConfigField "String", "VERSION_NAME", "\"${project.VERSION_NAME}\""
-
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -46,7 +36,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug { }
+        debug {
+            debuggable true
+        }
     }
 
     lint {
@@ -240,167 +232,4 @@ coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
 }
 
-
-// ---- javadoc.jar placeholder for Android ----
-// Maven Central requires a javadoc jar. For Android, publish an empty one or use Dokka.
-tasks.register("javadocJar", Jar) {
-    archiveClassifier.set("javadoc")
-    from(layout.projectDirectory.dir("empty-javadoc"))
-}
-
-// Maven Central publishing configuration (OSSRH s01)
-afterEvaluate {
-    publishing {
-        publications {
-            create("release", MavenPublication) {
-                def relComp = components.findByName('release') ?: components.findByName('default')
-                if (relComp != null) {
-                    from relComp
-                } else {
-                    artifact("$buildDir/outputs/aar/${project.name}-release.aar")
-                }
-                artifact tasks.named("javadocJar")
-                artifactId = "opensrp-client-native-form-new"
-
-                // For Central bundle releases, strip SNAPSHOT and local module deps from the published POM
-                if ((project.findProperty('centralRelease')?.toString()?.toBoolean()) == true) {
-                    pom.withXml {
-                        def n = asNode()
-                        def deps = n.get('dependencies')?.getAt(0)
-                        if (deps) {
-                            deps.children().removeAll { d ->
-                                def aid = d.artifactId?.text()
-                                def ver = d.version?.text()
-                                ver?.endsWith('SNAPSHOT') || ['circleprogressbar','opensrp-client-simprints','opensrp-client-materialedittext','opensrp-client-utils'].contains(aid)
-                            }
-                        }
-                    }
-                }
-
-                pom {
-                    name.set("OpenSRP Client Native Form (BlueCode fork)")
-                    description.set("BlueCode-maintained fork of the OpenSRP native form library")
-                    url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
-                    licenses {
-                        license {
-                            name.set("Apache-2.0")
-                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                        }
-                    }
-                    developers {
-                        developer {
-                            id.set("andrel")
-                            name.set("Andre Lesa")
-                            email.set("engineering@bluecodeltd.org")
-                        }
-                    }
-                    scm {
-                        connection.set("scm:git:git://github.com/BlueCodeSystems/Opensrp-client-native-form-new.git")
-                        developerConnection.set("scm:git:ssh://github.com:BlueCodeSystems/Opensrp-client-native-form-new.git")
-                        url.set("https://github.com/BlueCodeSystems/Opensrp-client-native-form-new")
-                    }
-                }
-            }
-        }
-        repositories {
-            maven {
-                name = "OSSRH"
-                url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
-                credentials {
-                    username = findProperty("ossrhUsername") as String
-                    password = findProperty("ossrhPassword") as String
-                }
-            }
-            // Optional local file-based repository to create a Central-compatible bundle
-            if ((project.findProperty('centralBundle')?.toString()?.toBoolean()) == true) {
-                maven {
-                    name = "CentralBundle"
-                    url = layout.buildDirectory.dir("central-bundle")
-                }
-            }
-        }
-    }
-}
-
-afterEvaluate {
-    signing {
-        // Sign only when not publishing to Maven Local and when keys are provided
-        def taskNames = gradle.startParameter.taskNames
-        def isMavenLocal = taskNames.any { it.contains('publishToMavenLocal') }
-        def skip = project.findProperty('skipSigning')?.toString()?.toBoolean() ?: false
-        def useCmd = project.findProperty('useGpgCmd')?.toString()?.toBoolean() ?: false
-
-        required {
-            !isMavenLocal && !skip && (
-                project.findProperty('signing.keyId') ||
-                project.findProperty('signingKey') ||
-                useCmd
-            )
-        }
-
-        if (useCmd) {
-            // Use local GnuPG for signing (configure keyName/passphrase in ~/.gradle/gradle.properties)
-            useGpgCmd()
-        }
-
-        def inMemKey = project.findProperty('signingKey')
-        def inMemPass = project.findProperty('signingPassword')
-        if (inMemKey && inMemPass) {
-            useInMemoryPgpKeys(inMemKey.toString(), inMemPass.toString())
-        }
-
-        sign(publishing.publications['release'])
-    }
-}
-
-// Optionally generate legacy checksums for portal validators
-tasks.register("generateCentralBundleChecksums") {
-    dependsOn tasks.matching { it.name == 'publishReleasePublicationToCentralBundleRepository' }
-    doLast {
-        def repoDir = layout.buildDirectory.dir("central-bundle").get().asFile
-        if (!repoDir.exists()) return
-        repoDir.eachFileRecurse { f ->
-            if (f.isFile() && !(f.name.endsWith('.md5') || f.name.endsWith('.sha1') || f.name.endsWith('.asc'))) {
-                def md5 = java.security.MessageDigest.getInstance('MD5')
-                def sha1 = java.security.MessageDigest.getInstance('SHA-1')
-                f.withInputStream { is ->
-                    byte[] buf = new byte[8192]
-                    int r
-                    while ((r = is.read(buf)) > 0) {
-                        md5.update(buf, 0, r)
-                        sha1.update(buf, 0, r)
-                    }
-                }
-                def toHex = { bytes -> bytes.collect { String.format('%02x', it) }.join() }
-                new File(f.parentFile, f.name + '.md5').text = toHex(md5.digest())
-                new File(f.parentFile, f.name + '.sha1').text = toHex(sha1.digest())
-            }
-        }
-    }
-}
-
-// Zip the local Central bundle repository for upload in the Central Portal UI
-tasks.register("zipCentralBundle", Zip) {
-    dependsOn tasks.named('generateCentralBundleChecksums')
-    // Only include the current coordinates/version, but preserve Maven layout
-    def groupPath = project.group.toString().replace('.', '/')
-    def artifact = 'opensrp-client-native-form-new'
-    def versionDir = "${groupPath}/${artifact}/${project.version}/**"
-    from(layout.buildDirectory.dir("central-bundle")) {
-        include versionDir
-    }
-    destinationDirectory = layout.buildDirectory.dir("distributions")
-    archiveBaseName.set("central-bundle-opensrp-client-native-form-new")
-    archiveVersion.set(project.version)
-}
-
-// Helper: print path and files to verify POM exists
-tasks.register("printCentralBundleLayout") {
-    dependsOn tasks.matching { it.name == 'publishReleasePublicationToCentralBundleRepository' }
-    doLast {
-        def base = layout.buildDirectory.dir('central-bundle').get().asFile
-        def path = new File(base, project.group.toString().replace('.', '/') + "/opensrp-client-native-form-new/" + project.version)
-        println "Bundle path: ${path}"
-        if (path.exists()) path.eachFile { println it.name } else println "Bundle path not found"
-    }
-}
+apply from: '../maven.gradle'

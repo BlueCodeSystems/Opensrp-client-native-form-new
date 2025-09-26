@@ -4,11 +4,12 @@ apply plugin: 'signing'
 
 android {
     namespace "com.emredavarci.circleprogressbar"
-    compileSdk androidCompileSdkVersion
+    compileSdk 35
+    buildToolsVersion '35.0.0'
 
     defaultConfig {
-        minSdk androidMinSdkVersion
-        targetSdk androidTargetSdkVersion
+        minSdk 28
+        targetSdk 35
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -38,14 +39,9 @@ android {
     publishing {
         singleVariant("release") {
             withSourcesJar()
+            withJavadocJar()
         }
     }
-}
-
-// Minimal javadoc jar placeholder (Central requires it)
-tasks.register("javadocJar", Jar) {
-    archiveClassifier.set("javadoc")
-    from(layout.projectDirectory.dir("empty-javadoc"))
 }
 
 afterEvaluate {
@@ -58,7 +54,6 @@ afterEvaluate {
                 } else {
                     artifact("$buildDir/outputs/aar/${project.name}-release.aar")
                 }
-                artifact tasks.named("javadocJar")
                 artifactId = "circleprogressbar"
 
                 pom {

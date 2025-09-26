@@ -1,95 +1,69 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven{  url 'https://plugins.gradle.org/m2/' }
-    }
-
-    dependencies {
-        classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.30.0"
-        classpath 'com.android.tools.build:gradle:8.5.2'
-        classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.12.0'
-    }
-}
-// Ensure all projects have correct coordinates
-allprojects { proj ->
-    proj.version = VERSION_NAME
-    // Do not force group for the library module; it publishes under the Central namespace
-    if (proj.name != 'android-json-form-wizard') {
-        proj.group = GROUP
-    }
+plugins {
+    id 'com.android.application' version '8.6.0' apply false
+    id 'com.android.library' version '8.6.0' apply false
+    id 'io.codearte.nexus-staging' version '0.30.0'
+    id 'com.github.kt3k.coveralls' version '2.12.0' apply false
 }
 
-configure(allprojects) { project ->
-    buildscript {
-        repositories {
-            mavenCentral()
-            google()
-            maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-            maven { url 'https://plugins.gradle.org/m2/'}
-            mavenLocal()
-        }
-    }
-}
-project.ext.preDexLibs = !project.hasProperty('disablePreDex')
-subprojects {
-
-    // Keep default group for app/test modules only; library overrides its own group
-
-    ext.androidToolsBuildGradle = '8.5.2'
-    ext.androidBuildToolsVersion = '34.0.0'
-    ext.androidMinSdkVersion = 19
-    ext.androidCompileSdkVersion = 34
-    ext.androidTargetSdkVersion = 34
-
-    ext.androidAnnotationsVersion = '3.0.1'
-    ext.androidAnnotationsAPIVersion = '3.0.1'
-
-    // Centralized dependency versions for alignment across modules
-    ext.appcompatVersion = '1.6.1'
-    ext.constraintLayoutVersion = '2.1.4'
-    ext.recyclerViewVersion = '1.3.1'
-    ext.cardViewVersion = '1.0.0'
-    ext.localBroadcastManagerVersion = '1.1.0'
-    ext.legacySupportV4Version = '1.0.0'
-    ext.multidexVersion = '2.0.1'
-    // Test libs (keep aligned to current working set)
-    ext.androidxTestExtJunitVersion = '1.1.3'
-    ext.espressoCoreVersion = '3.4.0'
-    ext.androidxTestRulesVersion = '1.4.0'
-    // Misc common libs
-    ext.timberVersion = '5.0.1'
-    ext.eventBusVersion = '3.2.0'
-    ext.gsonVersion = '2.9.0'
+allprojects { project ->
+    project.group = findProperty('GROUP') ?: 'org.smartregister'
+    project.version = findProperty('VERSION_NAME') ?: '0.0.1-SNAPSHOT'
 
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
         maven { url 'https://jitpack.io' }
+        maven { url 'https://cloudant.github.io/cloudant-sync-eap/repository' }
+        maven { url 'https://s3.amazonaws.com/repo.commonsware.com' }
+        maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots/' }
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
-        mavenLocal()
     }
 
-    // Improve build server performance by allowing disabling of pre-dexing
-    // (see http://tools.android.com/tech-docs/new-build-system/tips#TOC-Improving-Build-Server-performance.)
-    // Removed obsolete dexOptions configuration not supported in newer AGP
-}
-apply plugin: 'java'
-apply plugin: 'io.codearte.nexus-staging'
-// Configure test reports via tasks API
-tasks.withType(Test).configureEach {
-    reports {
-        html.required.set(false)
-        junitXml.required.set(false)
+    configurations.all {
+        resolutionStrategy {
+            dependencySubstitution {
+                substitute(module('com.github.BlueCodeSystems:opensrp-client-core'))
+                        .using(module('io.github.bluecodesystems:opensrp-client-core:6.2.2'))
+                substitute(module('io.github.bluecodesystems:android-p2p-sync'))
+                        .using(module('com.github.BlueCodeSystems:android-p2p-sync:v0.4.3'))
+            }
+            force 'com.commonsware.cwac:saferoom.x:1.3.0'
+        }
+        exclude group: 'com.commonsware.cwac', module: 'saferoom'
     }
 }
 
-def isReleaseBuild() {
-    return version.contains("SNAPSHOT") == false
+subprojects {
+    tasks.withType(Test).configureEach { testTask ->
+        maxParallelForks = 1
+        forkEvery = 0
+        jvmArgs(
+                '--add-opens=java.base/java.lang=ALL-UNNAMED',
+                '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
+                '--add-opens=java.base/java.io=ALL-UNNAMED',
+                '--add-opens=java.base/java.net=ALL-UNNAMED',
+                '--add-opens=java.base/java.util=ALL-UNNAMED',
+                '--add-opens=java.base/java.text=ALL-UNNAMED',
+                '--add-opens=java.base/java.security=ALL-UNNAMED',
+                '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED',
+                '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED',
+                '--add-opens=java.base/jdk.internal.util=ALL-UNNAMED',
+                '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+                '--add-opens=java.base/sun.security.util=ALL-UNNAMED',
+                '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED',
+                '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED'
+        )
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+        options.forkOptions.memoryMaximumSize = '2048m'
+    }
 }
 
-// Configure Nexus staging credentials if publishing to Sonatype
 nexusStaging {
+    serverUrl = 'https://s01.oss.sonatype.org/service/local/'
     username = findProperty('sonatypeUsername') ?: ''
     password = findProperty('sonatypePassword') ?: ''
 }
