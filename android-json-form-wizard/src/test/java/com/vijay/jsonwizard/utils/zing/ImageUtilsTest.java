@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 public class ImageUtilsTest extends BaseTest {
     @Mock
@@ -37,8 +37,8 @@ public class ImageUtilsTest extends BaseTest {
         options = new BitmapFactory.Options();
         Assert.assertNotNull(options);
 
-        Whitebox.setInternalState(options, "outHeight", 50);
-        Whitebox.setInternalState(options, "outWidth", 24);
+        TestReflectionHelpers.setInternalState(options, "outHeight", 50);
+        TestReflectionHelpers.setInternalState(options, "outWidth", 24);
 
         int inSampleSize = ImageUtils.calculateInSampleSize(options, 3, 5);
         Assert.assertEquals(4, inSampleSize);
@@ -49,8 +49,8 @@ public class ImageUtilsTest extends BaseTest {
         options = new BitmapFactory.Options();
         Assert.assertNotNull(options);
 
-        Whitebox.setInternalState(options, "outHeight", 1);
-        Whitebox.setInternalState(options, "outWidth", 1);
+        TestReflectionHelpers.setInternalState(options, "outHeight", 1);
+        TestReflectionHelpers.setInternalState(options, "outWidth", 1);
 
         int inSampleSize = ImageUtils.calculateInSampleSize(options, 3, 5);
         Assert.assertEquals(1, inSampleSize);
@@ -61,8 +61,8 @@ public class ImageUtilsTest extends BaseTest {
         options = new BitmapFactory.Options();
         Assert.assertNotNull(options);
 
-        Whitebox.setInternalState(options, "outHeight", 4);
-        Whitebox.setInternalState(options, "outWidth", 4);
+        TestReflectionHelpers.setInternalState(options, "outHeight", 4);
+        TestReflectionHelpers.setInternalState(options, "outWidth", 4);
 
         int inSampleSize = ImageUtils.calculateInSampleSize(options, 3, 5);
         Assert.assertEquals(1, inSampleSize);

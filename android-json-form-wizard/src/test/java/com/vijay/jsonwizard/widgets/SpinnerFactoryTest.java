@@ -10,7 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 import static org.junit.Assert.assertEquals;
 
@@ -71,7 +71,7 @@ public class SpinnerFactoryTest extends BaseTest {
 
     @Test
     public void testGetOptionsKeyValPairsShouldExtractCorrectPairs() throws Exception {
-        Pair<JSONArray, JSONArray> keyValPairs = Whitebox.invokeMethod(spinnerFactory, "getOptionsKeyValPairs", spinnerWidgetOptions);
+        Pair<JSONArray, JSONArray> keyValPairs = TestReflectionHelpers.invokeMethod(spinnerFactory, "getOptionsKeyValPairs", spinnerWidgetOptions);
         JSONArray actualKeys = keyValPairs.first;
         JSONArray actualVals = keyValPairs.second;
 

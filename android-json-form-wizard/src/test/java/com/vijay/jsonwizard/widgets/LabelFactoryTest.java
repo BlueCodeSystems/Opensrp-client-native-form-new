@@ -20,7 +20,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class LabelFactoryTest extends BaseTest {
         FormUtils formUtilsSpy = Mockito.spy(formUtils);
         Assert.assertNotNull(formUtilsSpy);
 
-        Whitebox.setInternalState(factorySpy, "formUtils", formUtilsSpy);
+        TestReflectionHelpers.setInternalState(factorySpy, "formUtils", formUtilsSpy);
 
         Mockito.doReturn(constraintLayout).when(formUtilsSpy).getRootConstraintLayout(context);
         Assert.assertNotNull(constraintLayout);

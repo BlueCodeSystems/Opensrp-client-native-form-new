@@ -21,7 +21,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 import java.util.List;
 import java.util.Locale;
@@ -84,7 +84,7 @@ public class TimePickerFactoryTest extends BaseTest {
         Mockito.doReturn(rootLayout).when(factorySpy).getRelativeLayout(context);
         Mockito.doReturn(editText).when(rootLayout).findViewById(R.id.edit_text);
         Editable editable = new Editable.Factory().newEditable("23:03");
-        Whitebox.invokeMethod(factorySpy, "updateTimeText", editText, 22, 3);
+        TestReflectionHelpers.invokeMethod(factorySpy, "updateTimeText", editText, 22, 3);
         Mockito.doReturn(editable).when(editText).getText();
         Assert.assertEquals("23:03", editable.toString());
 

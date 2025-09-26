@@ -5,24 +5,21 @@ import android.os.Environment;
 
 import org.jeasy.rules.api.Rules;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.MockitoAnnotations;
+import org.mockito.MockedStatic;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({Environment.class})
 public class DiskFileSourceTest {
 
     @Rule
@@ -31,22 +28,29 @@ public class DiskFileSourceTest {
     @Mock
     private Context context;
 
-    private DiskFileSource diskFileSource = Mockito.spy(DiskFileSource.INSTANCE);
+    private DiskFileSource diskFileSource;
 
-    @Mock
-    private File externalFile;
+    private MockedStatic<Environment> environmentMock;
 
     @Before
-    public void setUp() {
-        Mockito.doReturn("/tmp/downloads").when(externalFile).toString();
+    public void setUp() throws Exception {
+        MockitoAnnotations.openMocks(this);
+        diskFileSource = Mockito.spy(DiskFileSource.INSTANCE);
+        File downloadsDir = storageDirectory.newFolder("downloads");
+        environmentMock = Mockito.mockStatic(Environment.class);
+        environmentMock.when(() -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS))
+                .thenReturn(downloadsDir);
+    }
 
-        PowerMockito.mockStatic(Environment.class);
-        Mockito.when(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)).thenReturn(externalFile);
+    @After
+    public void tearDown() {
+        if (environmentMock != null) {
+            environmentMock.close();
+        }
     }
 
     @Test
     public void testGetRulesFromFileConvertsFileToRules() throws Exception {
-
         String specifiedString = "1";
         String relevance = "---\n" +
                 "name: step1_last_name\n" +
@@ -63,9 +67,9 @@ public class DiskFileSourceTest {
         Assert.assertFalse(rules.isEmpty());
 
         org.jeasy.rules.api.Rule rule = rules.iterator().next();
-        Assert.assertEquals(rule.getName(), "step1_last_name");
-        Assert.assertEquals(rule.getDescription(), "last_name");
-        Assert.assertEquals(rule.getPriority(), 1);
+        Assert.assertEquals("step1_last_name", rule.getName());
+        Assert.assertEquals("last_name", rule.getDescription());
+        Assert.assertEquals(1, rule.getPriority());
     }
 
 

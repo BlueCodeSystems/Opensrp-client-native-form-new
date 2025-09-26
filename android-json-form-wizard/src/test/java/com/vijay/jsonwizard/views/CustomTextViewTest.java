@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.RuntimeEnvironment;
 
 public class CustomTextViewTest extends BaseTest {
@@ -29,7 +29,7 @@ public class CustomTextViewTest extends BaseTest {
         Application application = Mockito.spy(Application.class);
         MockitoAnnotations.initMocks(this);
         Mockito.doReturn(context).when(application).getApplicationContext();
-        Whitebox.setInternalState(customTextView, "hintOnText", true);
+        TestReflectionHelpers.setInternalState(customTextView, "hintOnText", true);
         Mockito.doReturn(true).when(customTextViewMock).isEnabled();
     }
 

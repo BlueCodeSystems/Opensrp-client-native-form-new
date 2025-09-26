@@ -37,7 +37,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.internal.WhiteboxImpl;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.util.ReflectionHelpers;
@@ -296,16 +296,16 @@ public class UtilsTest extends BaseTest {
         ProgressDialog progressDialog = Mockito.mock(ProgressDialog.class);
         Mockito.doReturn(true).when(progressDialog).isShowing();
 
-        ReflectionHelpers.setStaticField(Utils.class, "progressDialog", progressDialog);
+        TestReflectionHelpers.setStaticField(Utils.class, "progressDialog", progressDialog);
         Utils.showProgressDialog(R.string.please_wait_title, R.string.please_wait, null);
-        Assert.assertEquals(progressDialog, ReflectionHelpers.getStaticField(Utils.class, "progressDialog"));
+        Assert.assertEquals(progressDialog, TestReflectionHelpers.getStaticField(Utils.class, "progressDialog"));
     }
 
     @Test
     public void testShowProgressDialogShouldCreateProgressDialog() {
-        ReflectionHelpers.setStaticField(Utils.class, "progressDialog", null);
+        TestReflectionHelpers.setStaticField(Utils.class, "progressDialog", null);
         Utils.showProgressDialog(R.string.hello_world, R.string.hello_world, RuntimeEnvironment.application);
-        ProgressDialog progressDialog = ReflectionHelpers.getStaticField(Utils.class, "progressDialog");
+        ProgressDialog progressDialog = TestReflectionHelpers.getStaticField(Utils.class, "progressDialog");
         Assert.assertTrue(progressDialog.isShowing());
     }
 
@@ -380,7 +380,7 @@ public class UtilsTest extends BaseTest {
         jsonObject.put(JsonFormConstants.VALUES, new JSONArray().put("yes").put("no").put("don't know"));
         Utils utils = new Utils();
         String expected = "yes, no, don't know";
-        Assert.assertEquals(expected, WhiteboxImpl.invokeMethod(utils, "getStringValue", jsonObject));
+        Assert.assertEquals(expected, TestReflectionHelpers.invokeMethod(utils, "getStringValue", jsonObject));
     }
 
     @Test

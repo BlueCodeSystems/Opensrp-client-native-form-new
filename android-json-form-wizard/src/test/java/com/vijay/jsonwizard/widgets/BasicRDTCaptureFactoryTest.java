@@ -28,7 +28,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 
@@ -66,7 +66,7 @@ public class BasicRDTCaptureFactoryTest extends FactoryTest {
 
         List<View> viewList = basicRDTCaptureFactory.getViewsFromJson("step1",
                 jsonFormActivity, formFragment, rdtCapture, listener, false);
-        WidgetArgs widgetArgs = ReflectionHelpers.getField(basicRDTCaptureFactory, "widgetArgs");
+        WidgetArgs widgetArgs = TestReflectionHelpers.getField(basicRDTCaptureFactory, "widgetArgs");
         Thread.sleep(1000);
 
         ShadowContextCompat.setPermissionStatus(1);
@@ -85,7 +85,7 @@ public class BasicRDTCaptureFactoryTest extends FactoryTest {
 
         // verify onActivityResultListener was registered
         HashMap<Integer, OnActivityResultListener> onActivityResultListeners =
-                ReflectionHelpers.getField(widgetArgs.getContext(), "onActivityResultListeners");
+                TestReflectionHelpers.getField(widgetArgs.getContext(), "onActivityResultListeners");
         assertEquals(basicRDTCaptureFactory, onActivityResultListeners.get(RDT_CAPTURE_CODE));
 
         // verify view tags were added
@@ -109,14 +109,14 @@ public class BasicRDTCaptureFactoryTest extends FactoryTest {
 
     @Test
     public void testCaptureActivityIsClosedOnBackPress() {
-        Whitebox.setInternalState(basicRDTCaptureFactory, "widgetArgs", getWidgetArgs());
+        TestReflectionHelpers.setInternalState(basicRDTCaptureFactory, "widgetArgs", getWidgetArgs());
         basicRDTCaptureFactory.onActivityResult(1, RESULT_CANCELED, null);
         verify(jsonFormActivity).finish();
     }
 
     @Test
     public void testOnActivityResultShouldCorrectlyExtractCaptureValues() throws JSONException {
-        Whitebox.setInternalState(basicRDTCaptureFactory, "widgetArgs", getWidgetArgs());
+        TestReflectionHelpers.setInternalState(basicRDTCaptureFactory, "widgetArgs", getWidgetArgs());
         Intent intent = new Intent();
         intent.putExtra(SAVED_IMAGE_FILE_PATH, "file_path");
 
@@ -125,7 +125,7 @@ public class BasicRDTCaptureFactoryTest extends FactoryTest {
         view.setTag(R.id.openmrs_entity_parent, "entity_parent");
         view.setTag(R.id.openmrs_entity, "entity");
         view.setTag(R.id.openmrs_entity_id, "entity_id");
-        Whitebox.setInternalState(basicRDTCaptureFactory, "rootLayout", view);
+        TestReflectionHelpers.setInternalState(basicRDTCaptureFactory, "rootLayout", view);
 
         basicRDTCaptureFactory.onActivityResult(RDT_CAPTURE_CODE, RESULT_OK, intent);
         verify(jsonFormActivity).writeValue(eq("step1"), eq("key"), eq("file_path"),

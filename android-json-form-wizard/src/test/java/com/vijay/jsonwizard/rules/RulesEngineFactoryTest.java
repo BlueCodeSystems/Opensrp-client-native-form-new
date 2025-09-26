@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.powermock.reflect.internal.WhiteboxImpl;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.util.ReflectionHelpers;
 
 import java.io.ByteArrayInputStream;
@@ -65,8 +65,8 @@ public class RulesEngineFactoryTest {
             JSONArray jsonArray = new JSONArray(expected);
             rulesEngineFactory = new RulesEngineFactory(context, new HashMap<String, String>());
             Map<String, Rules> ruleMap = new HashMap<>();
-            WhiteboxImpl.setInternalState(rulesEngineFactory, "ruleMap", ruleMap);
-            Rules result = WhiteboxImpl.invokeMethod(rulesEngineFactory, "getDynamicRulesFromJsonArray", jsonArray, JsonFormConstants.RELEVANCE);
+            TestReflectionHelpers.setInternalState(rulesEngineFactory, "ruleMap", ruleMap);
+            Rules result = TestReflectionHelpers.invokeMethod(rulesEngineFactory, "getDynamicRulesFromJsonArray", jsonArray, JsonFormConstants.RELEVANCE);
             Rule ruleObject = result.iterator().next();
             Assert.assertEquals("step1_diagnostic_test_result_spinner_key", ruleObject.getName());
             Assert.assertEquals("diagnostic_test_result_spinner_key", ruleObject.getDescription());
@@ -91,8 +91,8 @@ public class RulesEngineFactoryTest {
             JSONArray jsonArray = new JSONArray(expected);
             rulesEngineFactory = new RulesEngineFactory();
             Map<String, Rules> ruleMap = new HashMap<>();
-            WhiteboxImpl.setInternalState(rulesEngineFactory, "ruleMap", ruleMap);
-            Rules result = WhiteboxImpl.invokeMethod(rulesEngineFactory, "getDynamicRulesFromJsonArray", jsonArray, JsonFormConstants.RELEVANCE);
+            TestReflectionHelpers.setInternalState(rulesEngineFactory, "ruleMap", ruleMap);
+            Rules result = TestReflectionHelpers.invokeMethod(rulesEngineFactory, "getDynamicRulesFromJsonArray", jsonArray, JsonFormConstants.RELEVANCE);
             Assert.assertNull(result);
         } catch (JSONException e) {
             Timber.e(e);
@@ -250,14 +250,14 @@ public class RulesEngineFactoryTest {
 
     @Test
     public void testFormatCalculationShouldReturnEmptyString() throws Exception {
-        String result = WhiteboxImpl.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", "");
+        String result = TestReflectionHelpers.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", "");
         Assert.assertTrue(result.isEmpty());
     }
 
     @Test
     public void testFormatCalculationShouldReturnJsonString() throws Exception {
         HashMap<String, String> hashMap = new HashMap<>();
-        String result = WhiteboxImpl.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", hashMap);
+        String result = TestReflectionHelpers.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", hashMap);
         try {
             JSONObject jsonObject = new JSONObject(result);
             Assert.assertNotNull(jsonObject);
@@ -268,7 +268,7 @@ public class RulesEngineFactoryTest {
 
     @Test
     public void testFormatCalculationShouldReturnFloatTo2dp() throws Exception {
-        String result = WhiteboxImpl.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", "34.789");
+        String result = TestReflectionHelpers.invokeMethod(rulesEngineFactory, "formatCalculationReturnValue", "34.789");
         Assert.assertEquals("34.79", result);
     }
 
@@ -278,7 +278,7 @@ public class RulesEngineFactoryTest {
         JsonFormActivity jsonFormActivity = Mockito.mock(JsonFormActivity.class);
 
         rulesEngineFactory = new RulesEngineFactory(jsonFormActivity, new HashMap<String, String>());
-        ReflectionHelpers.callInstanceMethod(rulesEngineFactory, "getRulesFromAsset", ReflectionHelpers.ClassParameter.from(String.class, ruleFileName));
+        TestReflectionHelpers.callInstanceMethod(rulesEngineFactory, "getRulesFromAsset", TestReflectionHelpers.ClassParameter.from(String.class, ruleFileName));
 
         Mockito.verify(jsonFormActivity).handleFormError(true, ruleFileName);
     }

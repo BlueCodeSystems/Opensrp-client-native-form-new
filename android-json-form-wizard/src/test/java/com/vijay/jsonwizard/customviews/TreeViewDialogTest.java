@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.internal.WhiteboxImpl;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class TreeViewDialogTest extends BaseTest {
     public void testOnClickWhenExpandAllNodesIsTrueAndValueInDefaultValuesShouldNotExecuteOnClick() throws JSONException {
         ArrayList<String> strings = new ArrayList<>();
         strings.add("test");
-        WhiteboxImpl.setInternalState(treeViewDialog, "defaultValue", strings);
+        TestReflectionHelpers.setInternalState(treeViewDialog, "defaultValue", strings);
         treeViewDialog.setShouldExpandAllNodes(true);
         TreeNode treeNode = Mockito.mock(TreeNode.class);
         treeViewDialog.onClick(treeNode, "test");
@@ -44,7 +44,7 @@ public class TreeViewDialogTest extends BaseTest {
     public void testOnClickWhenExpandAllNodesIsTrueAndValueNotInDefaultValuesShouldExecuteOnClick() throws JSONException {
         ArrayList<String> strings = new ArrayList<>();
         strings.add("testing");
-        WhiteboxImpl.setInternalState(treeViewDialog, "defaultValue", strings);
+        TestReflectionHelpers.setInternalState(treeViewDialog, "defaultValue", strings);
         treeViewDialog.setShouldExpandAllNodes(true);
         TreeNode treeNode = Mockito.mock(TreeNode.class);
         treeViewDialog.onClick(treeNode, "test");

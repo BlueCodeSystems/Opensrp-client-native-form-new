@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.Robolectric;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -56,7 +56,7 @@ public class NativeEditTextTest extends BaseTest {
 
     @Test
     public void testInitWatchers() throws Exception {
-        Whitebox.invokeMethod(nativeEditText, "initTextWatcher");
+        TestReflectionHelpers.invokeMethod(nativeEditText, "initTextWatcher");
         nativeEditText.setText("new text");
         when(nativeEditText.getText()).thenCallRealMethod();
         Assert.assertEquals("new text", nativeEditText.getText().toString());

@@ -19,7 +19,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 import java.util.List;
 
@@ -77,7 +77,7 @@ public class CountDownTimerFactoryTest extends BaseTest {
         Assert.assertNotNull(factory);
         CountDownTimerFactory factorySpy = Mockito.spy(factory);
 
-        String timeText = Whitebox.invokeMethod(factorySpy, "getFormattedTimeText", 20000L);
+        String timeText = TestReflectionHelpers.invokeMethod(factorySpy, "getFormattedTimeText", 20000L);
         Assert.assertEquals("00:20", timeText);
     }
 }

@@ -27,7 +27,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +79,7 @@ public class CheckBoxFactoryTest extends BaseTest {
 
         FormUtils formUtils = new FormUtils();
         FormUtils formUtilsSpy = Mockito.spy(formUtils);
-        Whitebox.setInternalState(factorySpy, "formUtils", formUtilsSpy);
+        TestReflectionHelpers.setInternalState(factorySpy, "formUtils", formUtilsSpy);
 
         Mockito.doReturn(resources).when(context).getResources();
         Assert.assertNotNull(resources);
@@ -128,7 +128,7 @@ public class CheckBoxFactoryTest extends BaseTest {
         Mockito.doReturn(currentCheckbox).when(checkboxOptionLayout).getChildAt(0);
         Mockito.doReturn(true).when(currentCheckbox).isChecked();
 
-        Boolean checked = Whitebox.invokeMethod(factorySpy, "performValidation", rootLayoutSpy);
+        Boolean checked = TestReflectionHelpers.invokeMethod(factorySpy, "performValidation", rootLayoutSpy);
 
         Assert.assertTrue(checked);
     }

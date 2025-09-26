@@ -78,7 +78,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -145,7 +145,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
         when(formFragment.getJsonApi()).thenReturn(jsonFormActivity);
         formFragment.onFieldsInvalid = onFieldsInvalid;
         presenter = new JsonFormFragmentPresenter(formFragment, jsonFormInteractor);
-        Whitebox.setInternalState(presenter, "viewRef", new WeakReference<>(formFragment));
+        TestReflectionHelpers.setInternalState(presenter, "viewRef", new WeakReference<>(formFragment));
         textView = new TextView(context);
         JSONObject jsonForm = new JSONObject(TestConstants.PAOT_TEST_FORM);
         mStepDetails = jsonForm.getJSONObject(STEP1);
@@ -242,7 +242,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testAddFormElementsShouldDismissDialog() {
-        Whitebox.setInternalState(presenter, "cleanupAndExit", true);
+        TestReflectionHelpers.setInternalState(presenter, "cleanupAndExit", true);
         Bundle bundle = new Bundle();
         bundle.putString(JsonFormConstants.JSON_FORM_KEY.STEPNAME, STEP1);
         when(formFragment.getArguments()).thenReturn(bundle);
@@ -253,7 +253,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testSetUpToolBarForBottomNavigation() throws JSONException {
-        Whitebox.setInternalState(presenter, "mStepDetails", mStepDetails);
+        TestReflectionHelpers.setInternalState(presenter, "mStepDetails", mStepDetails);
         mStepDetails.put("bottom_navigation", true);
         presenter.setUpToolBar();
         verify(formFragment).updateVisibilityOfNextAndSave(false, false);
@@ -262,8 +262,8 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testSetUpToolBarForStep2AndMore() {
-        Whitebox.setInternalState(presenter, "mStepDetails", mStepDetails);
-        Whitebox.setInternalState(presenter, "mStepName", "step2");
+        TestReflectionHelpers.setInternalState(presenter, "mStepDetails", mStepDetails);
+        TestReflectionHelpers.setInternalState(presenter, "mStepName", "step2");
         presenter.setUpToolBar();
         verify(formFragment).setUpBackButton();
 
@@ -271,8 +271,8 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testSetUpToolBarIfStepHasNext() throws JSONException {
-        Whitebox.setInternalState(presenter, "mStepDetails", mStepDetails);
-        Whitebox.setInternalState(presenter, "mStepName", "step2");
+        TestReflectionHelpers.setInternalState(presenter, "mStepDetails", mStepDetails);
+        TestReflectionHelpers.setInternalState(presenter, "mStepName", "step2");
         mStepDetails.put("next", true);
         presenter.setUpToolBar();
         verify(formFragment).updateVisibilityOfNextAndSave(true, false);
@@ -281,8 +281,8 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testSetUpToolBarForLastLastStep() {
-        Whitebox.setInternalState(presenter, "mStepDetails", mStepDetails);
-        Whitebox.setInternalState(presenter, "mStepName", "step2");
+        TestReflectionHelpers.setInternalState(presenter, "mStepDetails", mStepDetails);
+        TestReflectionHelpers.setInternalState(presenter, "mStepName", "step2");
         presenter.setUpToolBar();
         verify(formFragment).updateVisibilityOfNextAndSave(false, true);
 
@@ -301,7 +301,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
         assertEquals(new ArrayList<>(), presenter.getIncorrectlyFormattedFields());
         Stack<String> stack = new Stack<>();
         stack.push("field1");
-        Whitebox.setInternalState(presenter, "incorrectlyFormattedFields", stack);
+        TestReflectionHelpers.setInternalState(presenter, "incorrectlyFormattedFields", stack);
         assertEquals(stack, presenter.getIncorrectlyFormattedFields());
     }
 
@@ -313,7 +313,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testOnNextClickReturnsFalseIfFormIsInvalid() {
-        Whitebox.setInternalState(presenter, "mStepDetails", mStepDetails);
+        TestReflectionHelpers.setInternalState(presenter, "mStepDetails", mStepDetails);
         doReturn(onFieldsInvalid).when(formFragment).getOnFieldsInvalidCallback();
         assertFalse(presenter.onNextClick(null));
     }
@@ -428,7 +428,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
         formFragment.getJsonApi().getmJSONObject().put(JsonFormConstants.SHOW_ERRORS_ON_SUBMIT, false);
         formFragment = spy(formFragment);
         doNothing().when(formFragment).showSnackBar(anyString());
-        Whitebox.setInternalState(presenter, "viewRef", new WeakReference<>(formFragment));
+        TestReflectionHelpers.setInternalState(presenter, "viewRef", new WeakReference<>(formFragment));
         presenter.onSaveClick(formFragment.getMainView());
         assertEquals(2, presenter.getInvalidFields().size());
         assertEquals("Please enter the last name", presenter.getInvalidFields().get("step1#Basic Form One:user_last_name").getErrorMessage());
@@ -454,12 +454,12 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
     @Test
     @Config(shadows = {ShadowContextCompat.class, ShadowPermissionUtils.class})
     public void testOnRequestPermissionsResultDisplaysCameraIntent() {
-        Whitebox.setInternalState(presenter, "key", "user_image");
-        Whitebox.setInternalState(presenter, "type", "choose_image");
+        TestReflectionHelpers.setInternalState(presenter, "key", "user_image");
+        TestReflectionHelpers.setInternalState(presenter, "type", "choose_image");
         when(formFragment.getContext()).thenReturn(context);
         presenter.onRequestPermissionsResult(CAMERA_PERMISSION_REQUEST_CODE, new String[]{permission.CAMERA, permission.READ_EXTERNAL_STORAGE, permission.WRITE_EXTERNAL_STORAGE}, new int[5]);
         verify(formFragment).hideKeyBoard();
-        assertEquals("user_image", Whitebox.getInternalState(presenter, "mCurrentKey"));
+        assertEquals("user_image", TestReflectionHelpers.getInternalState(presenter, "mCurrentKey"));
     }
 
     @Test
@@ -552,7 +552,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
         JsonFormFragmentPresenter spyPresenter = spy(presenter);
 
-        ReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
+        TestReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
 
         spyPresenter.onItemSelected(adapterView, mock(View.class), 0, 0);
 
@@ -654,7 +654,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
         view.addView(customTextView);
 
         JsonFormFragmentPresenter spyPresenter = spy(presenter);
-        ReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
+        TestReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
         JsonFormFragmentView jsonFormFragmentView = mock(JsonFormFragmentView.class);
         spyPresenter.attachView(jsonFormFragmentView);
         spyPresenter.onClick(customTextView);
@@ -685,7 +685,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
         view.addView(customTextView);
 
         JsonFormFragmentPresenter spyPresenter = spy(presenter);
-        ReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
+        TestReflectionHelpers.setField(spyPresenter, "mStepName", "step1");
         JsonFormFragmentView jsonFormFragmentView = mock(JsonFormFragmentView.class);
         spyPresenter.attachView(jsonFormFragmentView);
         spyPresenter.onClick(customTextView);
@@ -697,8 +697,8 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
 
     @Test
     public void testOnMenuItemClickOnNumberSelectorMenuShouldWriteValue() {
-        ReflectionHelpers.setStaticField(NumberSelectorFactory.class, "selectedTextView", mock(CustomTextView.class));
-        ReflectionHelpers.setField(presenter, "mStepName", STEP1);
+        TestReflectionHelpers.setStaticField(NumberSelectorFactory.class, "selectedTextView", mock(CustomTextView.class));
+        TestReflectionHelpers.setField(presenter, "mStepName", STEP1);
         Intent intent = new Intent();
         MenuItem menuItem = mock(MenuItem.class);
         doReturn("Test").when(menuItem).getTitle();
@@ -732,7 +732,7 @@ public class JsonFormFragmentPresenterRoboElectricTest extends BaseTest {
     @Test
     public void testCleanUp() {
         presenter.cleanUp();
-        boolean cleanUpAndExit = Whitebox.getInternalState(presenter, "cleanupAndExit");
+        boolean cleanUpAndExit = TestReflectionHelpers.getInternalState(presenter, "cleanupAndExit");
         assertTrue(cleanUpAndExit);
     }
 

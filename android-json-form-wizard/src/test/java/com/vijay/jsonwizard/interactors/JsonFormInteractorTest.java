@@ -18,7 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.LooperMode;
 import org.robolectric.util.ReflectionHelpers;
@@ -48,19 +48,19 @@ public class JsonFormInteractorTest extends BaseTest {
 
     @After
     public void tearDown() {
-        ReflectionHelpers.setField(jsonFormInteractor, "INSTANCE", null);
+        TestReflectionHelpers.setField(jsonFormInteractor, "INSTANCE", null);
     }
 
     @Test
     public void testFetchViewsShouldSetCorrectResultForRTE() throws Exception {
-        ReflectionHelpers.setField(jsonFormInteractor, "map", null);
+        TestReflectionHelpers.setField(jsonFormInteractor, "map", null);
 
         JsonFormActivity activity = Mockito.spy(Robolectric.buildActivity(JsonFormActivity.class, getJsonFormActivityIntent()).create().start().get());
         JsonFormFragment jsonFormFragment = Mockito.mock(JsonFormFragment.class);
         Mockito.doReturn(activity).when(jsonFormFragment).getActivity();
         Mockito.doReturn(activity).when(jsonFormFragment).getJsonApi();
         shadowOf(getMainLooper()).idle();
-        Whitebox.invokeMethod(jsonFormInteractor, "fetchViews", new ArrayList<View>(), "",
+        TestReflectionHelpers.invokeMethod(jsonFormInteractor, "fetchViews", new ArrayList<View>(), "",
                 jsonFormFragment, "", null, Mockito.mock(CommonListener.class), false);
 
         shadowOf(getMainLooper()).idle();

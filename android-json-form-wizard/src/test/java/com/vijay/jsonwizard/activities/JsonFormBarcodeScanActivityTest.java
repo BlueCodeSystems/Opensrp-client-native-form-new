@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.android.controller.ActivityController;
 
@@ -58,8 +57,7 @@ public class JsonFormBarcodeScanActivityTest extends BaseActivityTest {
         Assert.assertNotNull(detections);
         Mockito.doReturn(barcodeSparseArray).when(detections).getDetectedItems();
         Assert.assertNotNull(barcodeSparseArray);
-        Assert.assertEquals(0, barcodeSparseArray.size());
-        Whitebox.setInternalState(barcodeSparseArray.size(), 2);
+        Mockito.when(barcodeSparseArray.size()).thenReturn(2);
         Assert.assertEquals(2, barcodeSparseArray.size());
 
         barcodeScanActivity.receiveDetections(detections);

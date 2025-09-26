@@ -46,64 +46,68 @@ android {
         checkReleaseBuilds false
     }
 
+    packaging {
+        resources {
+            excludes += [
+                    'META-INF/DEPENDENCIES',
+                    'META-INF/LICENSE',
+                    'META-INF/LICENSE.txt',
+                    'META-INF/license.txt',
+                    'META-INF/NOTICE',
+                    'META-INF/NOTICE.txt',
+                    'META-INF/notice.txt',
+                    'META-INF/ASL2.0',
+                    'META-INF/INDEX.LIST'
+            ]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
             all {
-                // Open JDK17 modules for reflective access used by Robolectric/ReflectionHelpers
                 jvmArgs(
                         '--add-opens=java.base/java.lang=ALL-UNNAMED',
                         '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED',
                         '--add-opens=java.base/java.io=ALL-UNNAMED',
+                        '--add-opens=java.base/java.net=ALL-UNNAMED',
                         '--add-opens=java.base/java.util=ALL-UNNAMED',
                         '--add-opens=java.base/java.text=ALL-UNNAMED',
-                        '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED'
+                        '--add-opens=java.base/java.security=ALL-UNNAMED',
+                        '--add-opens=java.base/jdk.internal.reflect=ALL-UNNAMED',
+                        '--add-opens=java.base/jdk.internal.misc=ALL-UNNAMED',
+                        '--add-opens=java.base/jdk.internal.util=ALL-UNNAMED',
+                        '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED',
+                        '--add-opens=java.base/sun.security.util=ALL-UNNAMED',
+                        '--add-opens=java.desktop/java.awt.font=ALL-UNNAMED',
+                        '--add-exports=java.base/jdk.internal.reflect=ALL-UNNAMED',
+                        '-Xmx1024m'
                 )
+                systemProperty 'robolectric.dependency.repo.url', 'https://repo1.maven.org/maven2'
+                systemProperty 'robolectric.enabledSdks', '28'
             }
         }
     }
-    packaging {
-        resources {
-            excludes += 'META-INF/DEPENDENCIES'
-        }
-    }
 
-    // Generate BuildConfig for library (AGP 8 disables it by default)
-    buildFeatures {
-        buildConfig = true
-    }
-
-    // Enable publishing of the release variant and attach sources
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
-    namespace "com.vijay.jsonwizard"
-
-    // Enable core library desugaring for Java 8+ APIs used by dependencies
-    compileOptions {
-        coreLibraryDesugaringEnabled true
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
 }
 
-
-tasks.withType(Test) {
-    jacoco.includeNoLocationClasses = true
-    jacoco.excludes = ['jdk.internal.*']
+configurations.configureEach {
+    exclude group: 'net.zetetic', module: 'sqlcipher-android'
 }
 
 repositories {
-    // Prefer local flatDir if AARs are provided in the root or module libs
     flatDir {
         dirs rootProject.file('libs'), file("$projectDir/libs"), rootProject.projectDir
     }
-    // Ensure JitPack is available for GitHub-hosted libraries
     maven { url 'https://jitpack.io' }
     mavenCentral()
     google()
+    mavenLocal()
 }
 
 dependencies {
@@ -113,16 +117,14 @@ dependencies {
         exclude group: 'com.android.support', module: 'design'
     }
     implementation 'com.github.bmelnychuk:atv:1.2.9'
-    // Prefer a local patched Material AAR if provided; remove remote dependency to avoid AAPT issues
     implementation 'com.github.johnkil.print:print:1.3.1'
     implementation 'com.github.rey5137:material:1.3.1'
-    // Use the upgraded MaterialEditText fork published under BlueCode
     implementation 'io.github.bluecodesystems:materialedittext:3.1.6'
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.appcompat:appcompat:$appcompatVersion"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:$localBroadcastManagerVersion"
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "androidx.cardview:cardview:$cardViewVersion"
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.cardview:cardview:1.0.0'
     implementation('com.github.ganfra:material-spinner:2.0.0') {
         exclude group: 'com.nineoldandroids', module: 'library'
         exclude group: 'com.android.support', module: 'appcompat-v7'
@@ -141,10 +143,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
         exclude group: 'com.android.support', module: 'recyclerview-v7'
     }
-
-    // Use the upgraded OpenSRP client utils under BlueCode, release version
     implementation 'io.github.bluecodesystems:opensrp-client-utils:0.0.6'
-    implementation 'androidx.test:core:1.4.0'
+    testImplementation 'androidx.test:core:1.5.0'
 
     def easyRulesVersion = '3.4.0'
     implementation "org.jeasy:easy-rules-core:$easyRulesVersion"
@@ -152,79 +152,60 @@ dependencies {
 
     implementation 'joda-time:joda-time:2.10.14'
     implementation 'com.google.code.gson:gson:2.9.0'
-    // Pick up any local AARs/JARs (e.g., rdt-capture, rdt-reader) from root/libs, module libs, or root itself
-    // Note: Do NOT place CircleProgressbar AAR here if using the local module to avoid duplicates
     implementation fileTree(dir: rootProject.file('libs'), include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
     implementation fileTree(dir: "$projectDir/libs", include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
     implementation fileTree(dir: rootProject.projectDir, include: ['*.aar', '*.jar'], exclude: ['circleprogressbar*.aar', 'CircleProgressbar*.aar'])
-
-    // Use published CircleProgressbar package under BlueCode
     implementation 'io.github.bluecodesystems:circleprogressbar:1.0.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-
-    // CircleProgressbar will be picked up via fileTree above if present locally
-    implementation "com.jakewharton.timber:timber:$timberVersion"
-    implementation "org.greenrobot:eventbus:$eventBusVersion"
-    implementation "androidx.multidex:multidex:$multidexVersion"
-
-    // PowerMock
-    def powerMockVersion = '2.0.9'
-    testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
-    testImplementation "org.powermock:powermock-module-junit4-rule:$powerMockVersion"
-    testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
-    testImplementation "org.powermock:powermock-classloading-xstream:$powerMockVersion"
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+    implementation 'org.greenrobot:eventbus:3.2.0'
     implementation('com.github.raihan-mpower:FancyAlertDialog-Android:0.3@aar') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
-
-    }
-
-    androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.6.3'
-    androidTestImplementation 'junit:junit:4.13.2'
-    androidTestImplementation("androidx.test.ext:junit:$androidxTestExtJunitVersion") {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-
-    }
-    androidTestImplementation("androidx.test.espresso:espresso-core:$espressoCoreVersion") {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
-    androidTestImplementation("androidx.test:rules:$androidxTestRulesVersion") {
-        exclude group: 'com.android.support', module: 'appcompat-v7'
-
     }
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.apache.maven:maven-ant-tasks:2.1.3'
-    testImplementation 'org.mockito:mockito-core:3.12.4'
-    testImplementation('com.squareup:fest-android:1.0.8') { exclude module: 'support-v4' }
+    testImplementation 'org.mockito:mockito-core:5.2.0'
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
     testImplementation 'org.robolectric:robolectric:4.10.3'
-    testImplementation "org.json:json:20220320"
+    testImplementation 'androidx.sqlite:sqlite:2.3.1'
+    testImplementation 'net.zetetic:android-database-sqlcipher:4.5.4'
+    testImplementation 'org.json:json:20231013'
 
-    // Core library desugaring for Java 8+ APIs on older Android devices
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'com.jayway.android.robotium:robotium-solo:5.6.3'
 }
 
-task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
-
-    reports {
-        xml.required.set(true)
-        xml.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"))
-
-        html.required.set(true)
-        html.outputLocation.set(file("${buildDir}/reports/jacoco/jacocoRootReport/html"))
+tasks.withType(Test).configureEach {
+    jacoco {
+        includeNoLocationClasses = true
+        excludes = ['jdk.internal.*']
     }
-
-    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*', '**/*$ViewBinder*.*']
-    def debugTree = fileTree(dir: "$project.buildDir/intermediates/javac/debug/classes/", excludes: fileFilter)
-    def mainSrc = "$project.projectDir/src/main/java"
-
-    sourceDirectories.from = files([mainSrc])
-    classDirectories.from = files([debugTree])
-    executionData.from = fileTree(dir: project.buildDir, includes: [
-            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
-    ])
 }
 
-tasks.coveralls {
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+    reports {
+        xml.required = true
+        xml.outputLocation = file("${buildDir}/reports/jacoco/jacocoRootReport/merged.xml")
+        html.required = true
+        html.outputLocation = file("${buildDir}/reports/jacoco/jacocoRootReport/html")
+    }
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*', '**/*$ViewBinder*.*']
+    def debugTree = fileTree(dir: "$buildDir/intermediates/javac/debug/classes", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec',
+            'outputs/code-coverage/connected/*coverage.ec'
+    ]))
+}
+
+tasks.named('coveralls') {
     dependsOn 'jacocoTestReport'
 }
 

@@ -22,7 +22,7 @@ import com.vijay.jsonwizard.BaseTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.Calendar;
@@ -66,7 +66,7 @@ public class DatePickerDialogTest extends BaseTest {
 
     public void testSetOnShowListenerShouldSetListener() {
         datePickerDialog.setOnShowListener(onShowListener);
-        assertEquals(onShowListener, Whitebox.getInternalState(datePickerDialog, "onShowListener"));
+        assertEquals(onShowListener, TestReflectionHelpers.getInternalState(datePickerDialog, "onShowListener"));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class DatePickerDialogTest extends BaseTest {
         when(activity.getSystemService(Context.INPUT_METHOD_SERVICE)).thenReturn(inputManager);
         when(activity.getCurrentFocus()).thenReturn(mock(View.class));
         datePickerDialog.onCreateView(LayoutInflater.from(RuntimeEnvironment.application), null, null);
-        onShowListener = Whitebox.getInternalState(datePickerDialog, "onShowListener");
+        onShowListener = TestReflectionHelpers.getInternalState(datePickerDialog, "onShowListener");
         onShowListener.onShow(dialog);
         verify(activity).getSystemService(Context.INPUT_METHOD_SERVICE);
         verify(activity).getCurrentFocus();

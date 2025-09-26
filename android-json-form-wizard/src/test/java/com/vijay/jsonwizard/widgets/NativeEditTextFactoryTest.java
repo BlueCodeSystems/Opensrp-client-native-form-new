@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.RuntimeEnvironment;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class NativeEditTextFactoryTest extends BaseTest {
 
     @Test
     public void testValidate() throws Exception {
-        boolean isValid = Whitebox.invokeMethod(nativeEditText, "validate");
+        boolean isValid = TestReflectionHelpers.invokeMethod(nativeEditText, "validate");
         Assert.assertFalse(isValid);
     }
 }

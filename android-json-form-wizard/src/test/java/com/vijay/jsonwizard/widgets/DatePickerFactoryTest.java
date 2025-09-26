@@ -25,7 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
@@ -132,7 +132,7 @@ public class DatePickerFactoryTest extends BaseTest {
         verify(fragmentManager).beginTransaction();
         verify(fragmentManager).executePendingTransactions();
         DatePickerDialog datePickerDialog = datePickerDialogArgumentCaptor.getValue();
-        assertEquals("12-05-2020", new SimpleDateFormat("dd-MM-yyyy").format(Whitebox.getInternalState(datePickerDialog, "date")));
+        assertEquals("12-05-2020", new SimpleDateFormat("dd-MM-yyyy").format(TestReflectionHelpers.getInternalState(datePickerDialog, "date")));
 
     }
 

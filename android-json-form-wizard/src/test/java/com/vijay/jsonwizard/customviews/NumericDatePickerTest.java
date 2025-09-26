@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.powermock.reflect.Whitebox;
+import com.vijay.jsonwizard.testutils.TestReflectionHelpers;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.util.ReflectionHelpers;
@@ -199,16 +199,16 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.FEBRUARY + 1);
         monthPicker.setTag(R.id.previous, Calendar.JANUARY + 1);
 
-        NumberPicker dayPicker = ReflectionHelpers.getField(datePicker, "dayPicker");
+        NumberPicker dayPicker = TestReflectionHelpers.getField(datePicker, "dayPicker");
         dayPicker.setValue(30);
 
-        ReflectionHelpers.setField(datePicker, "previousDay", 1);
+        TestReflectionHelpers.setField(datePicker, "previousDay", 1);
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(1, datePicker.getDayOfMonth());
@@ -223,17 +223,17 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.SEPTEMBER + 1);
 
-        NumberPicker dayPicker = ReflectionHelpers.getField(datePicker, "dayPicker");
+        NumberPicker dayPicker = TestReflectionHelpers.getField(datePicker, "dayPicker");
         dayPicker.setValue(31);
         dayPicker.setTag(R.id.previous, 30);
 
-        ReflectionHelpers.setField(datePicker, "previousDay", 30);
+        TestReflectionHelpers.setField(datePicker, "previousDay", 30);
 
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(30, datePicker.getDayOfMonth());
@@ -247,23 +247,23 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "maxDate", 1405890000000l);
+        TestReflectionHelpers.setField(datePicker, "maxDate", 1405890000000l);
 
-        ReflectionHelpers.setField(datePicker, "maxYear", 2014);
+        TestReflectionHelpers.setField(datePicker, "maxYear", 2014);
 
-        ReflectionHelpers.setField(datePicker, "maxMonth", Calendar.JULY);
+        TestReflectionHelpers.setField(datePicker, "maxMonth", Calendar.JULY);
 
-        ReflectionHelpers.setField(datePicker, "maxDay", 21);
+        TestReflectionHelpers.setField(datePicker, "maxDay", 21);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(2020);
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.NOVEMBER + 1);
 
         Assert.assertEquals(Calendar.NOVEMBER, datePicker.getMonth());
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.year);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.year);
         datePicker.resetDatePicker();
 
         int dayOfMonthToday = new LocalDate().getDayOfMonth();
@@ -285,24 +285,24 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "maxDate", 1595192400000L);
+        TestReflectionHelpers.setField(datePicker, "maxDate", 1595192400000L);
 
-        ReflectionHelpers.setField(datePicker, "maxYear", 2020);
+        TestReflectionHelpers.setField(datePicker, "maxYear", 2020);
 
-        ReflectionHelpers.setField(datePicker, "maxMonth", Calendar.AUGUST);
+        TestReflectionHelpers.setField(datePicker, "maxMonth", Calendar.AUGUST);
 
-        ReflectionHelpers.setField(datePicker, "maxDay", 21);
+        TestReflectionHelpers.setField(datePicker, "maxDay", 21);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(2020);
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.SEPTEMBER + 1);
         monthPicker.setTag(R.id.previous, Calendar.AUGUST + 1);
 
         Assert.assertEquals(Calendar.SEPTEMBER, datePicker.getMonth());
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
         datePicker.resetDatePicker();
 
         int dayOfMonthToday = new LocalDate().getDayOfMonth();
@@ -323,26 +323,26 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "maxDate", 1592254800000l);
+        TestReflectionHelpers.setField(datePicker, "maxDate", 1592254800000l);
 
-        ReflectionHelpers.setField(datePicker, "maxYear", 2020);
+        TestReflectionHelpers.setField(datePicker, "maxYear", 2020);
 
-        ReflectionHelpers.setField(datePicker, "maxMonth", Calendar.JUNE);
+        TestReflectionHelpers.setField(datePicker, "maxMonth", Calendar.JUNE);
 
-        ReflectionHelpers.setField(datePicker, "maxDay", 16);
+        TestReflectionHelpers.setField(datePicker, "maxDay", 16);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(2020);
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.JUNE + 1);
 
-        NumberPicker dayPicker = ReflectionHelpers.getField(datePicker, "dayPicker");
+        NumberPicker dayPicker = TestReflectionHelpers.getField(datePicker, "dayPicker");
         dayPicker.setValue(17);
         dayPicker.setTag(R.id.previous, 16);
         Assert.assertEquals(17, datePicker.getDayOfMonth());
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(16, datePicker.getDayOfMonth());
@@ -357,23 +357,23 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "minDate", 1360530000000l);
+        TestReflectionHelpers.setField(datePicker, "minDate", 1360530000000l);
 
-        ReflectionHelpers.setField(datePicker, "minYear", 2013);
+        TestReflectionHelpers.setField(datePicker, "minYear", 2013);
 
-        ReflectionHelpers.setField(datePicker, "minMonth", Calendar.FEBRUARY);
+        TestReflectionHelpers.setField(datePicker, "minMonth", Calendar.FEBRUARY);
 
-        ReflectionHelpers.setField(datePicker, "minDay", 11);
+        TestReflectionHelpers.setField(datePicker, "minDay", 11);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(2010);
 
         Assert.assertEquals(2010, datePicker.getYear());
 
-        NumberPicker dayPicker = ReflectionHelpers.getField(datePicker, "dayPicker");
+        NumberPicker dayPicker = TestReflectionHelpers.getField(datePicker, "dayPicker");
         dayPicker.setValue(17);
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.year);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.year);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(2013, datePicker.getYear());
@@ -388,24 +388,24 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "minDate", 1099515600000l);
+        TestReflectionHelpers.setField(datePicker, "minDate", 1099515600000l);
 
-        ReflectionHelpers.setField(datePicker, "minYear", 2004);
+        TestReflectionHelpers.setField(datePicker, "minYear", 2004);
 
-        ReflectionHelpers.setField(datePicker, "minMonth", Calendar.NOVEMBER);
+        TestReflectionHelpers.setField(datePicker, "minMonth", Calendar.NOVEMBER);
 
-        ReflectionHelpers.setField(datePicker, "minDay", 4);
+        TestReflectionHelpers.setField(datePicker, "minDay", 4);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(2004);
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.OCTOBER + 1);
         monthPicker.setTag(R.id.previous, Calendar.NOVEMBER + 1);
 
         Assert.assertEquals(Calendar.OCTOBER, datePicker.getMonth());
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.month);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(Calendar.NOVEMBER, datePicker.getMonth());
@@ -419,26 +419,26 @@ public class NumericDatePickerTest extends BaseTest {
 
         //Set malformed date
 
-        ReflectionHelpers.setField(datePicker, "minDate", 815000400000l);
+        TestReflectionHelpers.setField(datePicker, "minDate", 815000400000l);
 
-        ReflectionHelpers.setField(datePicker, "minYear", 1995);
+        TestReflectionHelpers.setField(datePicker, "minYear", 1995);
 
-        ReflectionHelpers.setField(datePicker, "minMonth", Calendar.OCTOBER);
+        TestReflectionHelpers.setField(datePicker, "minMonth", Calendar.OCTOBER);
 
-        ReflectionHelpers.setField(datePicker, "minDay", 30);
+        TestReflectionHelpers.setField(datePicker, "minDay", 30);
 
-        NumberPicker yearPicker = ReflectionHelpers.getField(datePicker, "yearPicker");
+        NumberPicker yearPicker = TestReflectionHelpers.getField(datePicker, "yearPicker");
         yearPicker.setValue(1995);
 
-        NumberPicker monthPicker = ReflectionHelpers.getField(datePicker, "monthPicker");
+        NumberPicker monthPicker = TestReflectionHelpers.getField(datePicker, "monthPicker");
         monthPicker.setValue(Calendar.OCTOBER + 1);
 
-        NumberPicker dayPicker = ReflectionHelpers.getField(datePicker, "dayPicker");
+        NumberPicker dayPicker = TestReflectionHelpers.getField(datePicker, "dayPicker");
         dayPicker.setValue(29);
         dayPicker.setTag(R.id.previous, 30);
         Assert.assertEquals(29, datePicker.getDayOfMonth());
 
-        ReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
+        TestReflectionHelpers.setField(datePicker, "changedPickerId", R.id.day);
         datePicker.resetDatePicker();
 
         Assert.assertEquals(30, datePicker.getDayOfMonth());
@@ -454,7 +454,7 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = -2;
         int minDay = 1;
-        Assert.assertEquals(1, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(1, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 
     @Test
@@ -465,7 +465,7 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = 10;
         int minDay = 30;
-        Assert.assertEquals(10, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(10, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 
     @Test
@@ -476,7 +476,7 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = 31;
         int minDay = 30;
-        Assert.assertEquals(30, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(30, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 
     @Test
@@ -487,7 +487,7 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = 35;
         int minDay = 31;
-        Assert.assertEquals(31, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(31, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 
     @Test
@@ -498,7 +498,7 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = 31;
         int minDay = 28;
-        Assert.assertEquals(28, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(28, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 
     @Test
@@ -509,6 +509,6 @@ public class NumericDatePickerTest extends BaseTest {
 
         int prevDay = 31;
         int minDay = 29;
-        Assert.assertEquals(29, (int) Whitebox.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
+        Assert.assertEquals(29, (int) TestReflectionHelpers.invokeMethod(datePicker1, "getPreviousDay", prevDay, minDay));
     }
 }
