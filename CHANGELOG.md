@@ -5,12 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
-### Changed
-- Replace the GPS dialog's legacy `GoogleApiClient` implementation with the fused location provider, add loader/status messaging, and enforce automatic cleanup and timeout fallbacks when no high-accuracy fix is available.
-- Bump `com.google.android.gms:play-services-location` to 21.3.0 for the modern fused location APIs.
 
+## [3.2.0] - 2025-10-02
 ### Added
 - Allow form JSON to override the GPS widget accuracy and timeout via the `accuracy_threshold` (meters) and `timeout_seconds` keys.
+
+### Changed
+- Replace the GPS dialog's legacy `GoogleApiClient` implementation with the fused location provider, add loader/status messaging, and enforce automatic cleanup and timeout fallbacks when no high-accuracy fix is available.
+
+### Dependencies
+- Bump `com.google.android.gms:play-services-location` to 21.3.0 for the modern fused location APIs.
 
 ## [3.1.5] - 2025-09-26
 ### Changed
