@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Changed
+- Replace the GPS dialog's legacy `GoogleApiClient` implementation with the fused location provider, add loader/status messaging, and enforce automatic cleanup and timeout fallbacks when no high-accuracy fix is available.
+- Bump `com.google.android.gms:play-services-location` to 21.3.0 for the modern fused location APIs.
+
+### Added
+- Allow form JSON to override the GPS widget accuracy and timeout via the `accuracy_threshold` (meters) and `timeout_seconds` keys.
+
 ## [3.1.5] - 2025-09-26
 ### Changed
 - Adopt Gradle 8.7 and Android Gradle Plugin 8.6.0 for the library build.

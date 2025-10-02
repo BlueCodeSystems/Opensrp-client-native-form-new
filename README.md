@@ -121,6 +121,19 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 }
 ```
 
+### GPS widget configuration
+- The GPS dialog now waits for a fused-location fix, showing a loading spinner and accuracy updates before it enables the `OK` button.
+- Forms can override the defaults (10 m accuracy, 15 s timeout) with optional JSON keys:
+  ```json
+  {
+    "key": "user_gps",
+    "type": "gps",
+    "accuracy_threshold": 8.0,
+    "timeout_seconds": 20
+  }
+  ```
+- When the timeout lapses without a high-accuracy fix, the dialog re-enables `OK` so the user can accept the best reading captured so far.
+
 ## Sample app
 The `sample/` module exercises the core widgets and rules. Install it on a connected device or emulator with:
 
