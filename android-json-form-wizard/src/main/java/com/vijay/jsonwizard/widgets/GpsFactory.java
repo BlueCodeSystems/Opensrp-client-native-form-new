@@ -5,9 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,8 +36,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import timber.log.Timber;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * Captures GPS locations
@@ -51,6 +54,9 @@ import timber.log.Timber;
 public class GpsFactory implements FormWidgetFactory {
 
     protected GpsDialog gpsDialog;
+
+    private static final String JSON_ACCURACY_THRESHOLD = "accuracy_threshold";
+    private static final String JSON_TIMEOUT_SECONDS = "timeout_seconds";
 
     public static ValidationStatus validate(JsonFormFragmentView formFragmentView,
                                             Button recordButton) {
@@ -177,14 +183,19 @@ public class GpsFactory implements FormWidgetFactory {
 
         attachLayout(context, jsonObject, recordButton, latitudeTV, longitudeTV, altitudeTV, accuracyTV);
 
-        gpsDialog = getGpsDialog(recordButton, context, latitudeTV, longitudeTV, altitudeTV, accuracyTV);
+        double accuracyThreshold = resolveAccuracyThreshold(jsonObject);
+        long timeoutMillis = resolveTimeoutMillis(jsonObject);
+
+        gpsDialog = getGpsDialog(recordButton, context, latitudeTV, longitudeTV, altitudeTV, accuracyTV,
+                accuracyThreshold, timeoutMillis);
 
         customizeViews(recordButton, context);
 
         recordButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                requestPermissionsForLocation(context);
+                disableRecordButton(recordButton);
+                requestPermissionsForLocation(context, recordButton);
             }
         });
 
@@ -197,8 +208,49 @@ public class GpsFactory implements FormWidgetFactory {
     }
 
     @NotNull
-    public GpsDialog getGpsDialog(Button recordButton, Context context, TextView latitudeTV, TextView longitudeTV, TextView altitudeTV, TextView accuracyTV) {
-        return new GpsDialog(context, recordButton, latitudeTV, longitudeTV, altitudeTV, accuracyTV);
+    public GpsDialog getGpsDialog(Button recordButton,
+                                  Context context,
+                                  TextView latitudeTV,
+                                  TextView longitudeTV,
+                                  TextView altitudeTV,
+                                  TextView accuracyTV,
+                                  double accuracyThreshold,
+                                  long timeoutMillis) {
+        return new GpsDialog(context, recordButton, latitudeTV, longitudeTV, altitudeTV, accuracyTV,
+                accuracyThreshold, timeoutMillis);
+    }
+
+    @NotNull
+    public GpsDialog getGpsDialog(Button recordButton, Context context, TextView latitudeTV, TextView longitudeTV,
+                                  TextView altitudeTV, TextView accuracyTV) {
+        return getGpsDialog(recordButton, context, latitudeTV, longitudeTV, altitudeTV, accuracyTV,
+                GpsDialog.DEFAULT_ACCURACY_THRESHOLD_METERS, GpsDialog.DEFAULT_TIMEOUT_MILLIS);
+    }
+
+    protected double resolveAccuracyThreshold(@Nullable JSONObject jsonObject) {
+        if (jsonObject == null) {
+            return GpsDialog.DEFAULT_ACCURACY_THRESHOLD_METERS;
+        }
+
+        double threshold = jsonObject.optDouble(JSON_ACCURACY_THRESHOLD, Double.NaN);
+        if (Double.isNaN(threshold) || threshold <= 0) {
+            return GpsDialog.DEFAULT_ACCURACY_THRESHOLD_METERS;
+        }
+
+        return threshold;
+    }
+
+    protected long resolveTimeoutMillis(@Nullable JSONObject jsonObject) {
+        if (jsonObject == null) {
+            return GpsDialog.DEFAULT_TIMEOUT_MILLIS;
+        }
+
+        double timeoutSeconds = jsonObject.optDouble(JSON_TIMEOUT_SECONDS, -1d);
+        if (timeoutSeconds <= 0) {
+            return GpsDialog.DEFAULT_TIMEOUT_MILLIS;
+        }
+
+        return Math.max(TimeUnit.SECONDS.toMillis(1), Math.round(timeoutSeconds * 1000d));
     }
 
     protected void customizeViews(Button recordButton, Context context) {
@@ -262,7 +314,46 @@ public class GpsFactory implements FormWidgetFactory {
         return String.format(context.getResources().getString(p), latitude);
     }
 
+    protected void disableRecordButton(@Nullable Button recordButton) {
+        if (recordButton == null) {
+            return;
+        }
+
+        recordButton.setTag(R.id.gps_record_button_enabled_state, recordButton.isEnabled());
+        recordButton.setEnabled(false);
+        recordButton.setAlpha(0.5f);
+    }
+
+    protected void restoreRecordButton(@Nullable Button recordButton) {
+        if (recordButton == null) {
+            return;
+        }
+
+        Object originalState = recordButton.getTag(R.id.gps_record_button_enabled_state);
+        if (originalState instanceof Boolean) {
+            boolean enabled = (Boolean) originalState;
+            recordButton.setEnabled(enabled);
+            recordButton.setAlpha(enabled ? 1f : 0.5f);
+            recordButton.setTag(R.id.gps_record_button_enabled_state, null);
+        } else {
+            recordButton.setEnabled(true);
+            recordButton.setAlpha(1f);
+        }
+    }
+
     public void requestPermissionsForLocation(Context context) {
+        Button recordButton = null;
+        if (gpsDialog != null) {
+            View recordButtonView = gpsDialog.getRecordButtonView();
+            if (recordButtonView instanceof Button) {
+                recordButton = (Button) recordButtonView;
+            }
+        }
+
+        requestPermissionsForLocation(context, recordButton);
+    }
+
+    public void requestPermissionsForLocation(Context context, @Nullable final Button recordButton) {
         if (context instanceof Activity) {
             Activity activity = (Activity) context;
 
@@ -276,16 +367,23 @@ public class GpsFactory implements FormWidgetFactory {
                             if (PermissionUtils.verifyPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
                                 showGpsDialog();
                             } else {
-                                jsonApi.removeOnActivityRequestPermissionResultListener(PermissionUtils.FINE_LOCATION_PERMISSION_REQUEST_CODE);
+                                restoreRecordButton(recordButton);
                             }
+                            jsonApi.removeOnActivityRequestPermissionResultListener(PermissionUtils.FINE_LOCATION_PERMISSION_REQUEST_CODE);
                         }
                     });
+                } else {
+                    Timber.w("Host activity does not implement JsonApi; restoring record button immediately");
+                    restoreRecordButton(recordButton);
                 }
 
                 ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PermissionUtils.FINE_LOCATION_PERMISSION_REQUEST_CODE);
             } else {
                 showGpsDialog();
             }
+        } else {
+            Timber.w("Context is not an Activity; cannot request location permission");
+            restoreRecordButton(recordButton);
         }
     }
 

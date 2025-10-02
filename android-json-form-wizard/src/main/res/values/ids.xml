@@ -88,5 +88,6 @@
     <item name="simprints_guid" type="id" />
     <item name="is_repeating_group_generated" type="id" />
     <item name="has_required_validator" type="id" />
+    <item name="gps_record_button_enabled_state" type="id" />
 
 </resources>

@@ -11,6 +11,7 @@
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal">
         <ProgressBar
+            android:id="@+id/location_progress"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:indeterminate="true"
@@ -24,6 +25,12 @@
             android:layout_marginStart="@dimen/inner_components_spacing"
             android:layout_marginEnd="@dimen/inner_components_spacing"
             android:orientation="vertical">
+            <com.rey.material.widget.TextView
+                android:id="@+id/status_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/default_text_size"
+                android:text="@string/gps_searching_for_fix" />
             <com.rey.material.widget.TextView
                 android:id="@+id/accuracy"
                 android:layout_width="wrap_content"

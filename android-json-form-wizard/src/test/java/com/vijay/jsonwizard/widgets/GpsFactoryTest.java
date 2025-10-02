@@ -109,7 +109,9 @@ public class GpsFactoryTest extends BaseTest {
 
         Mockito.doReturn("my-test").when(factorySpy).getText(ArgumentMatchers.eq(context), ArgumentMatchers.anyString(), ArgumentMatchers.anyInt());
 
-        Mockito.doReturn(gpsDialog).when(factorySpy).getGpsDialog(recordButton, context, latitudeTV, longitudeTV, altitudeTV, accuracyTV);
+        Mockito.doReturn(gpsDialog).when(factorySpy).getGpsDialog(Mockito.eq(recordButton), Mockito.eq(context),
+                Mockito.eq(latitudeTV), Mockito.eq(longitudeTV), Mockito.eq(altitudeTV), Mockito.eq(accuracyTV),
+                Mockito.anyDouble(), Mockito.anyLong());
         Assert.assertNotNull(gpsDialog);
 
         String gpsString = "{\"key\":\"gps\",\"openmrs_entity_parent\":\"usual_residence\",\"openmrs_entity\":\"person_address\",\"openmrs_entity_id\":\"geopoint\",\"openmrs_data_type\":\"text\",\"type\":\"gps\",\"v_required\":{\"value\":true,\"err\":\"Please enter the child's home facility\"},\"read_only\":true,\"relevance\":{\"step1:Birth_Facility_Name\":{\"type\":\"string\",\"ex\":\"equalTo(., \\\"[\\\"Other\\\"]\\\")\"}}}";
