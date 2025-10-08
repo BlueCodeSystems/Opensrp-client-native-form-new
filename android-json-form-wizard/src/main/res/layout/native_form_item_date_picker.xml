@@ -9,6 +9,7 @@
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:imeOptions="flagNoExtractUi"
         android:textSize="@dimen/default_text_size"
         app:met_floatingLabel="highlight"
         app:met_floatingLabelText=""

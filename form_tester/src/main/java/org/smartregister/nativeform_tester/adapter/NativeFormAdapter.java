@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.smartregister.nativeform.R;
+import org.smartregister.nativeform.tester.R;
 import org.smartregister.nativeform_tester.contract.FormTesterContract;
 
 import java.util.ArrayList;

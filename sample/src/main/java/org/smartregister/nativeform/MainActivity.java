@@ -18,6 +18,7 @@ import com.vijay.jsonwizard.utils.FormUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.smartregister.nativeform.sample.R;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int REQUEST_CODE_GET_JSON = 1234;
@@ -264,45 +265,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View view) {
         int id = view.getId();
         try {
-            switch (id) {
-                case R.id.child_enrollment:
-                    startForm(REQUEST_CODE_GET_JSON, "single_form", null, true);
-                    break;
-                case R.id.wizard_form:
-                    startForm(REQUEST_CODE_GET_JSON, "wizard_form", null, false);
-                    break;
-                case R.id.native_form_basic:
-                    startForm(REQUEST_CODE_GET_JSON, "basic_form", null, false);
-                    break;
-                case R.id.update_radio_button:
-                    startForm(REQUEST_CODE_GET_JSON, "update_radio_button", null, false);
-                    break;
-                case R.id.rules_engine_skip_logic:
-                    startForm(REQUEST_CODE_GET_JSON, "rules_engine_demo", null, false);
-                    break;
-                case R.id.numbers_selector_widget:
-                    startForm(REQUEST_CODE_GET_JSON, "constraints_demo", null, false);
-                    break;
-                case R.id.generic_dialog_button:
-                    startForm(REQUEST_CODE_GET_JSON, "generic_popup_form", null, false);
-                    break;
-                case R.id.validation_form_button:
-                    startForm(REQUEST_CODE_GET_JSON, "validation_form", null, false);
-                    break;
-                case R.id.expansion_panel_button:
-                    startForm(REQUEST_CODE_GET_JSON, "expansion_panel_form", null, false);
-                    break;
-                case R.id.repeating_group_button:
-                    startForm(REQUEST_CODE_GET_JSON, "repeating_group", null, false);
-                    break;
-                case R.id.multiselect_list:
-                    startForm(REQUEST_CODE_GET_JSON, "multi_select_list_form", null, false);
-                    break;
-                case R.id.optibp_widget:
-                    startForm(REQUEST_CODE_GET_JSON, "optibp_demo_form", null, false);
-                    break;
-                default:
-                    break;
+            if (id == R.id.child_enrollment) {
+                startForm(REQUEST_CODE_GET_JSON, "single_form", null, true);
+            } else if (id == R.id.wizard_form) {
+                startForm(REQUEST_CODE_GET_JSON, "wizard_form", null, false);
+            } else if (id == R.id.native_form_basic) {
+                startForm(REQUEST_CODE_GET_JSON, "basic_form", null, false);
+            } else if (id == R.id.update_radio_button) {
+                startForm(REQUEST_CODE_GET_JSON, "update_radio_button", null, false);
+            } else if (id == R.id.rules_engine_skip_logic) {
+                startForm(REQUEST_CODE_GET_JSON, "rules_engine_demo", null, false);
+            } else if (id == R.id.numbers_selector_widget) {
+                startForm(REQUEST_CODE_GET_JSON, "constraints_demo", null, false);
+            } else if (id == R.id.generic_dialog_button) {
+                startForm(REQUEST_CODE_GET_JSON, "generic_popup_form", null, false);
+            } else if (id == R.id.validation_form_button) {
+                startForm(REQUEST_CODE_GET_JSON, "validation_form", null, false);
+            } else if (id == R.id.expansion_panel_button) {
+                startForm(REQUEST_CODE_GET_JSON, "expansion_panel_form", null, false);
+            } else if (id == R.id.repeating_group_button) {
+                startForm(REQUEST_CODE_GET_JSON, "repeating_group", null, false);
+            } else if (id == R.id.multiselect_list) {
+                startForm(REQUEST_CODE_GET_JSON, "multi_select_list_form", null, false);
+            } else if (id == R.id.optibp_widget) {
+                startForm(REQUEST_CODE_GET_JSON, "optibp_demo_form", null, false);
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);

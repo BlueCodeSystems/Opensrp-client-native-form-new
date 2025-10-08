@@ -183,6 +183,7 @@ public class SpinnerFactory extends BaseFactory {
             spinner.setSelection(indexToSelect + 1, true);
             spinner.setOnItemSelectedListener(listener);
         }
+        
         ((JsonApi) context).addFormDataView(spinner);
 
         formUtils.showInfoIcon(stepName, jsonObject, listener, FormUtils.getInfoDialogAttributes(jsonObject), spinnerInfoIconImageView,
