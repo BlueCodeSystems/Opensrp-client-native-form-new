@@ -4,7 +4,7 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.smartregister.nativeform.R;
+import org.smartregister.nativeform.tester.R;
 import org.smartregister.nativeform_tester.contract.AndroidPermissionHelper;
 import org.smartregister.nativeform_tester.contract.FormTesterContract;
 import org.smartregister.nativeform_tester.interactor.FormTesterInteractor;

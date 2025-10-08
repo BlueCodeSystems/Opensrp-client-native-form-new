@@ -67,6 +67,16 @@ public class DatePickerDialog extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup dialogView = (ViewGroup) inflater.inflate(R.layout.native_form_dialog_date_picker, container, false);
 
+        // Optionally set the title from arguments
+        try {
+            android.widget.TextView titleView = dialogView.findViewById(R.id.dialog_title);
+            String title = getArguments() != null ? getArguments().getString("title") : null;
+            if (title != null && title.trim().length() > 0) {
+                titleView.setText(title);
+                titleView.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception ignored) { }
+
         Button cancelButton;
         Button okButton;
 

@@ -27,7 +27,7 @@ import com.vijay.jsonwizard.domain.Form;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
-import org.smartregister.nativeform.R;
+import org.smartregister.nativeform.tester.R;
 import org.smartregister.nativeform_tester.adapter.NativeFormAdapter;
 import org.smartregister.nativeform_tester.contract.AndroidPermissionHelper;
 import org.smartregister.nativeform_tester.contract.FormTesterContract;

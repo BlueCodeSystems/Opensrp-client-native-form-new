@@ -230,6 +230,11 @@ public class DatePickerFactory implements FormWidgetFactory {
             addRefreshLogicView(context, editText, relevance, constraints, calculations);
             Bundle datePickerArgs = new Bundle();
             datePickerArgs.putString(JsonFormConstants.DEFAULT, jsonObject.optString(JsonFormConstants.DEFAULT));
+            // Pass the field hint as dialog title
+            CharSequence hint = editText.getHint();
+            if (hint != null) {
+                datePickerArgs.putString("title", hint.toString());
+            }
             datePickerDialog.setArguments(datePickerArgs);
             editText.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -270,6 +275,9 @@ public class DatePickerFactory implements FormWidgetFactory {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
+                    if (formFragment != null) {
+                        formFragment.scrollToView(editText);
+                    }
                     datePickerDialog.setArguments(new Bundle());
                     showDatePickerDialog(context, datePickerDialog, editText);
                 }
