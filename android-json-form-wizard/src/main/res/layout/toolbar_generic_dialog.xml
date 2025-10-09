@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/generic_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
@@ -18,7 +18,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
+                android:layout_height="?attr/actionBarSize"
                 android:orientation="horizontal">
 
                 <RelativeLayout
@@ -46,9 +46,7 @@
                         android:layout_height="match_parent"
                         android:layout_margin="6dp"
                         android:layout_toStartOf="@+id/generic_dialog_done_button"
-                        android:layout_toLeftOf="@+id/generic_dialog_done_button"
                         android:layout_toEndOf="@+id/imageButton"
-                        android:layout_toRightOf="@+id/imageButton"
                         android:gravity="center_vertical"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:textColor="@color/white" />
@@ -61,7 +59,6 @@
                         android:layout_height="match_parent"
                         android:layout_alignParentTop="true"
                         android:layout_alignParentEnd="true"
-                        android:layout_gravity="right|center_horizontal|end"
                         android:background="@color/transparent"
                         android:paddingStart="@dimen/advanced_search_toolbar_drawable_padding"
                         android:paddingEnd="@dimen/advanced_search_toolbar_drawable_padding"
@@ -72,6 +69,6 @@
                         android:textSize="@dimen/advanced_search_toolbar_text_size" />
                 </RelativeLayout>
             </LinearLayout>
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
 </LinearLayout>
