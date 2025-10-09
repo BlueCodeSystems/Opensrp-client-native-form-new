@@ -111,6 +111,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.android.material:material:1.12.0'
     implementation('io.github.bluecodesystems:opensrp-client-simprints:1.1.0@aar') {
         transitive = true
         exclude group: 'com.android.support', module: 'appcompat-v7'
@@ -214,3 +215,4 @@ coveralls {
 }
 
 apply from: '../maven.gradle'
+
