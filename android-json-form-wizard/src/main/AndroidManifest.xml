@@ -24,6 +24,11 @@
         android:theme="@style/NativeFormsAppTheme"
         tools:replace="android:theme">
 
+        <provider
+            android:name=".utils.JsonFormGsonInitializer"
+            android:authorities="${applicationId}.jsonform.gsoninitializer"
+            android:exported="false" />
+
         <activity
             android:name=".activities.JsonFormBarcodeScanActivity"
             android:configChanges="keyboardHidden|orientation"
