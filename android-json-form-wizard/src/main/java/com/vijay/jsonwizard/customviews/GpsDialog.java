@@ -65,7 +65,7 @@ public class GpsDialog extends Dialog implements LocationListener, GoogleApiClie
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GpsDialog.this.dismiss();
+                safeDismiss();
             }
         });
 
@@ -81,7 +81,7 @@ public class GpsDialog extends Dialog implements LocationListener, GoogleApiClie
 
     protected void saveAndDismiss() {
         updateLocationViews(lastLocation);
-        GpsDialog.this.dismiss();
+        safeDismiss();
     }
 
     protected void initGoogleApiClient() {
@@ -133,7 +133,7 @@ public class GpsDialog extends Dialog implements LocationListener, GoogleApiClie
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        this.dismiss();
+        safeDismiss();
         Toast.makeText(context, R.string.could_not_get_your_location, Toast.LENGTH_LONG).show();
     }
 
@@ -175,5 +175,17 @@ public class GpsDialog extends Dialog implements LocationListener, GoogleApiClie
 
     public void setDialogAccuracyTV(TextView dialogAccuracyTV) {
         this.dialogAccuracyTV = dialogAccuracyTV;
+    }
+
+    private void safeDismiss() {
+        try {
+            if (isShowing()) {
+                dismiss();
+            }
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            // The dialog can already be detached when a delayed callback fires.
+        } finally {
+            disconnectGoogleApiClient();
+        }
     }
 }
