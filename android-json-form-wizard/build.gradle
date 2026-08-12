@@ -240,9 +240,9 @@ afterEvaluate { p ->
 
     // Optional Javadoc jar from existing javadoc task if available
     tasks.register('androidJavadocsJar', Jar) {
-        dependsOn tasks.named('javadoc')
         archiveClassifier.set('javadoc')
-        from tasks.named('javadoc').get().destinationDir
+        // JitPack only needs the AAR and POM. Keep this archive self-contained so
+        // publication does not fail when javadoc generation is skipped.
     }
 
     publishing {

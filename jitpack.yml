@@ -2,5 +2,4 @@ jdk:
   - openjdk11
 
 install:
-  - ./gradlew -Pversion=${VERSION} :circleprogressbar:publishReleasePublicationToMavenLocal :android-json-form-wizard:publishReleasePublicationToMavenLocal -x test -x lint --no-daemon --stacktrace
-
+  - ./gradlew -Pversion=${VERSION} :android-json-form-wizard:publishReleasePublicationToMavenLocal -x test -x lint -x javadoc --no-daemon --stacktrace
