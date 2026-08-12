@@ -1,6 +1,7 @@
 package com.vijay.jsonwizard.rules;
 
 import android.content.Context;
+import android.os.Looper;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import timber.log.Timber;
 
@@ -36,6 +39,7 @@ public class RulesEngineFactory implements RuleListener {
     private Context context;
     private RulesEngine defaultRulesEngine;
     private Map<String, Rules> ruleMap;
+    private Set<String> loadingRuleFiles;
     private String RULE_FOLDER_PATH = "rule/";
     private Rules rules;
     private String selectedRuleName;
@@ -50,6 +54,7 @@ public class RulesEngineFactory implements RuleListener {
         this.defaultRulesEngine = new DefaultRulesEngine(parameters);
         ((DefaultRulesEngine) this.defaultRulesEngine).registerRuleListener(this);
         this.ruleMap = new HashMap<>();
+        this.loadingRuleFiles = ConcurrentHashMap.newKeySet();
         gson = new Gson();
         this.rulesEngineHelper = new RulesEngineHelper();
         this.mvelRuleFactory = new MVELRuleFactory(new YamlRuleDefinitionReader());
@@ -116,6 +121,9 @@ public class RulesEngineFactory implements RuleListener {
         facts.put(RuleConstant.IS_RELEVANT, false);
 
         rules = getRulesFromAsset(RULE_FOLDER_PATH + ruleFilename);
+        if (rules == null) {
+            return false;
+        }
 
         processDefaultRules(rules, facts);
 
@@ -129,6 +137,9 @@ public class RulesEngineFactory implements RuleListener {
         facts.put(RuleConstant.IS_RELEVANT, false);
 
         rules = getDynamicRulesFromJsonArray(rulesStrObject, JsonFormConstants.RELEVANCE);
+        if (rules == null) {
+            return false;
+        }
 
         processDefaultRules(rules, facts);
 
@@ -146,33 +157,23 @@ public class RulesEngineFactory implements RuleListener {
 
 
     public Rules getRulesFromAsset(String fileName) {
+        Rules cachedRules = ruleMap.get(fileName);
+        if (cachedRules != null) {
+            return cachedRules;
+        }
 
-        try {
-            if (!ruleMap.containsKey(fileName)) {
-
-                if (context instanceof ClientFormContract.View) {
-                    try {
-                        BufferedReader bufferedReader = ((ClientFormContract.View) context).getRules(context, fileName);
-                        ruleMap.put(fileName, mvelRuleFactory.createRules(bufferedReader));
-                    } catch (Exception ex) {
-                        ((ClientFormContract.View) context).handleFormError(true, fileName);
-                        return null;
-                    }
-                } else {
-                    ruleMap.put(fileName, FileSourceFactoryHelper.getFileSource(JsonFormBaseActivity.DATA_SOURCE).getRulesFromFile(context, fileName));
-                }
-            }
-            return ruleMap.get(fileName);
-        } catch (IOException e) {
-            Timber.e(e, "%s getRulesFromAsset", this.getClass().getCanonicalName());
-            return null;
-        } catch (Exception e) {
-            Timber.e(e);
+        if (isMainThread()) {
+            warmRulesAsync(fileName);
             return null;
         }
+
+        return loadRules(fileName);
     }
 
     protected void processDefaultRules(Rules rules, Facts facts) {
+        if (rules == null) {
+            return;
+        }
         defaultRulesEngine.fire(rules, facts);
     }
 
@@ -204,6 +205,9 @@ public class RulesEngineFactory implements RuleListener {
         Facts facts = initializeFacts(calculationFact);
         facts.put(RuleConstant.CALCULATION, "");
         rules = getRulesFromAsset(RULE_FOLDER_PATH + ruleFilename);
+        if (rules == null) {
+            return "";
+        }
         processDefaultRules(rules, facts);
 
         return formatCalculationReturnValue(facts.get(RuleConstant.CALCULATION));
@@ -216,6 +220,9 @@ public class RulesEngineFactory implements RuleListener {
         facts.put(RuleConstant.CALCULATION, false);
 
         rules = getDynamicRulesFromJsonArray(rulesStrObject, JsonFormConstants.CALCULATION);
+        if (rules == null) {
+            return "";
+        }
 
         processDefaultRules(rules, facts);
 
@@ -242,6 +249,9 @@ public class RulesEngineFactory implements RuleListener {
         Facts facts = initializeFacts(constraintFact);
         facts.put(RuleConstant.CONSTRAINT, "0");
         rules = getRulesFromAsset(RULE_FOLDER_PATH + ruleFilename);
+        if (rules == null) {
+            return "0";
+        }
         processDefaultRules(rules, facts);
 
         return formatCalculationReturnValue(facts.get(RuleConstant.CONSTRAINT));
@@ -278,6 +288,57 @@ public class RulesEngineFactory implements RuleListener {
 
     public void setRulesFolderPath(String path) {
         RULE_FOLDER_PATH = path;
+    }
+
+    private boolean isMainThread() {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
+    }
+
+    private void warmRulesAsync(final String fileName) {
+        if (!loadingRuleFiles.add(fileName)) {
+            return;
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    loadRules(fileName);
+                } finally {
+                    loadingRuleFiles.remove(fileName);
+                }
+            }
+        }).start();
+    }
+
+    private Rules loadRules(String fileName) {
+        try {
+            Rules loadedRules;
+            if (context instanceof ClientFormContract.View) {
+                try {
+                    BufferedReader bufferedReader = ((ClientFormContract.View) context).getRules(context, fileName);
+                    loadedRules = mvelRuleFactory.createRules(bufferedReader);
+                } catch (Exception ex) {
+                    ((ClientFormContract.View) context).handleFormError(true, fileName);
+                    return null;
+                }
+            } else {
+                loadedRules = FileSourceFactoryHelper.getFileSource(JsonFormBaseActivity.DATA_SOURCE)
+                        .getRulesFromFile(context, fileName);
+            }
+
+            if (loadedRules != null) {
+                ruleMap.put(fileName, loadedRules);
+            }
+
+            return loadedRules;
+        } catch (IOException e) {
+            Timber.e(e, "%s getRulesFromAsset", this.getClass().getCanonicalName());
+            return null;
+        } catch (Exception e) {
+            Timber.e(e);
+            return null;
+        }
     }
 
 }

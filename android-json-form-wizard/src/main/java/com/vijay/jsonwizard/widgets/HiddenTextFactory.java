@@ -84,12 +84,10 @@ public class HiddenTextFactory implements FormWidgetFactory {
 
         hiddenText.setVisibility(View.GONE);
 
-        hiddenText.addTextChangedListener(new GenericTextWatcher(stepName, formFragment, hiddenText));
-
         attachRefreshLogic(context, hiddenText, relevance, constraints, calculation);
 
-        // Handle setting injected value (if exists) after attaching listener so that changes can be
-        // effected by the listener and calculations applied
+        // Set the injected value before attaching the watcher so initial form bootstrap does not
+        // trigger expensive rule evaluation on the main thread.
         final String value = jsonObject.optString(JsonFormConstants.VALUE);
         if (StringUtils.isNotBlank(value) && formFragment.getContext() != null) {
             formFragment.getJsonApi().getAppExecutors().mainThread().execute(new Runnable() {
@@ -99,6 +97,8 @@ public class HiddenTextFactory implements FormWidgetFactory {
                 }
             });
         }
+
+        hiddenText.addTextChangedListener(new GenericTextWatcher(stepName, formFragment, hiddenText));
     }
 
     private void attachRefreshLogic(Context context, MaterialEditText hiddenText, String relevance, String constraints, String calculation) {
